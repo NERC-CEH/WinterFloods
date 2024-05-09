@@ -1,22 +1,28 @@
 ### giaves 2023-11-10
-# Extract highest groundwater within 5 days (BEFORE only) of given events
+# 08458: Winter Floods 2019-21
+
+# Main contributor: Adam Griffin
+# Info: Extract highest groundwater within 5 days (BEFORE only) of given events
 # at the closest GW station to the flow station recording the event
 
-rm(list = ls())
-setwd("P:/08458 CWI-EA 2019-21 Flood Review")
+# Version 0.1: 2023-11-10. Initial development of code
+# Version 0.2: 2023-11-30. Refactoring for wider distribution.
+
+## NOTE: requires source groundwater data from stations. Not supplied with data product.
+
+
 #### SETUP ####
 library(zoo)
 library(tidyverse)
 library(readxl)
-Sys.setenv(tz = "utc")
 
 #### KEY FILEPATHS ####
-key_details_filename <- "Data/Master Station Listings UKCEH_post queries.xlsx"
+key_details_filename <- "Data/Metadata/Master Station Listings.xlsx"
 groundwater_meta_filename <- "Data/Groundwater/Station_shortlist.csv"
 gw_full_rec_folder <- "Data/Groundwater/FullRecord/"
 
-gw_metadata_outfile <- "Data/Tables_for_Reporting/Table GroundwaterMeta.csv"
-gw_events_outfile <- "Data/Groundwater/Event_Antecedent_max_level_or_min_dip2.csv"
+gw_metadata_outfile <- "Data/Metadata/Groundwater_Metadata.csv"
+gw_events_outfile <- "Data/Groundwater/Event_Antecedent_max_level_or_min_dip.csv"
 
 #### READ IN DATA ####
 Master <- readxl::read_excel(key_details_filename,

@@ -1,6 +1,13 @@
-### giaves 2023-10-09
-# Read 30-, 60-, 90- and 180-day rainfall maxima, and add ranks and return periods
+#### giaves 2023-10-09
+# 08458: Winter Floods 2019-21
 
+# Main contributor: GV
+# Info: Read 30-, 60-, 90- and 180-day rainfall maxima, and add ranks and return periods
+
+# Version 0.1: 2023-10-09. Initial development of code
+# Version 0.2: 2023-11-01. Refactoring for wider distribution.
+
+### NOTE: source rain gauge data not given as data product in this project.
 
 setwd("P:/08458 CWI-EA 2019-21 Flood Review")
 
@@ -10,8 +17,8 @@ library(readr)
 library(lmom)
 library(lmomRFA)
 
-CSVL <- list.files(path = "Data/Rainfall_long_AMAX", pattern = "Maxima_table_", full = TRUE)
-AMAX1 <- list.files(path = "Data/Rainfall_long_AMAX", pattern = "WF_AMAX1_table_", full = TRUE)
+CSVL <- list.files(path = "Data/Rainfall_long_duration", pattern = "Maxima_table_", full = TRUE)
+AMAX1 <- list.files(path = "Data/Rainfall_long_duration", pattern = "WF_AMAX1_table_", full = TRUE)
 
 ID <- unique(readr::read_csv(CSVL[1])$ID)
 
@@ -55,6 +62,6 @@ for (C in 1:length(CSVL)) {
   }
   
   readr::write_csv(RainWF, 
-      sprintf("Data/Rainfall_long_AMAX/Maxima_rank_RP_table_%s_day_WF_years_only.csv", Dur))
+      sprintf("Data/Rainfall_long_duration/Maxima_rank_RP_table_%s_day_WF_years_only.csv", Dur))
   
 }

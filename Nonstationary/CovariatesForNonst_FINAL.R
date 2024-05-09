@@ -1,5 +1,3 @@
-# Land cover to catchments
-
 #### Griffin, Adam. 2024-01-01
 # 08458: Winter Floods 2019-21
 
@@ -14,13 +12,10 @@ library(tidyverse)
 library(lfstat)
 library(pracma)
 
-
-setwd("P:/08458 CWI-EA 2019-21 Flood Review/Code/NonstationaryFFA")
-
 rainfall_path <- "./Data/HadUK-Grid_CatAvgDailyRain"
-dates_path <-  "./Data/dates_of_events.csv"
-events_path <- "./Data/KeyDetails/KeyDetails_Long.csv"
-NRFA_path <- "./NRFA_PF_V12/suitable-for-pooling"
+dates_path <-  "./Data/Nonstationary/dates_of_events.csv"
+events_path <- "./Data/Metadata/KeyDetails_Long.csv"
+NRFA_path <- "./NRFA_PF_V12/suitable-for-pooling" ## Needs NRFA Peak flow dataset
 
 
 

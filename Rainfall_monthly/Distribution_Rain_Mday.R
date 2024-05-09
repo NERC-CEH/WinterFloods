@@ -3,7 +3,6 @@
 
 # Read M-day rainfall maxima, choose best and acceptable distributions for each catchment, hence overall best
 
-
 # Version 0.1: 2023-02-16. Initial development of code
 # Version 0.2: 2023-11-01. Refactoring for wider distribution.
 
@@ -19,7 +18,7 @@ library(readr)
 ##### key arguments #####
 MDAY <- 30
 rainfall_maxima_filepath <- paste0(
-  "Data/Rainfall_long_AMAX/Maxima_table_",MDAY,"_day.csv")
+  "Data/Rainfall_long_duration/Maxima_table_",MDAY,"_day.csv")
 
 
 ##### Read in data #####
@@ -73,4 +72,4 @@ DistGrid$Station <- ID
 
 #save to file
 readr::write_csv(DistGrid, 
-    paste0("./Data/Rainfall_long_AMAX/distribution_test", MDAY,"_day.csv"))
+    paste0("./Data/Rainfall_long_duration/distribution_test", MDAY,"_day.csv"))

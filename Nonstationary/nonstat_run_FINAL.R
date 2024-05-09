@@ -2,11 +2,10 @@
 # 08458: Winter Floods 2019-21
 
 # Main contributor: Adam Griffin
-# Info: Matching storms with antecedent conditions
+# Info: Nonstationary flood frequency analysis
 
 # Version 0.1: 2024-01-15. Initial development of code
 
-setwd("P:/08458 CWI-EA 2019-21 Flood Review")
 #### SETUP ####
 library(lfstat)
 library(ggplot2)
@@ -19,14 +18,14 @@ lfwy <- \(x){
 }
 
 #### KEY FILEPATHS ####
-folder <- "./Code/NonstationaryFFA/Data/NONST"
+folder <- "./Data/Nonstationary/"
 dist <- "GEV"
 RPs <- c(2, 10, 20, 50, 100)
 CI <- 90
-key_details_filename <- "./Data/Master Station Listings UKCEH_post queries.xlsx"
-all_amax_filename <- "./Data/Peaks from Continuous/AMAX_from_Q_15_list.csv"
-GLO_RP_out <- "./Data/NONST/Outputs/KeyEvents_AEP_GLO.csv"
-GEV_RP_out <- "./Data/NONST/Outputs/KeyEvents_AEP_GEV.csv"
+key_details_filename <- "./Data/Metadata/Master Station Listings.xlsx"
+all_amax_filename <- "./Data/Flow/AMAX_from_Q_15_list.csv"
+GLO_RP_out <- "./Data/Nonstationary/KeyEvents_AEP_GLO.csv"
+GEV_RP_out <- "./Data/Nonstationary/KeyEvents_AEP_GEV.csv"
 
 # Trend testing ---------------------------------------------
 MK.test(folder, sig.level = 5)
@@ -38,9 +37,6 @@ PELT.test(folder)
 GEVfits <- fit.time(dist, folder, RPs, CI)
 GLOfits <- fit.time("GLO", folder, RPs, CI)
 
-save(GEVfits, GLOfits, file="GEVfits.rda")
-# Run the plotting functions
-load("./Data/NONST/GEVfits.rda")
 
 for(gauge in names(GEVfits)){
 type <- "Varying location and scale"

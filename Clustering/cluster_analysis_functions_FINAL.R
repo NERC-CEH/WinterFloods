@@ -1,3 +1,13 @@
+#### Griffin, Adam. 2023-09-01
+# 08458: Winter Floods 2019-21
+
+# Main contributor: Adam Griffin
+# Info: functions to perform cluster analysis of POT series.
+
+# Version 0.1: 2023-06-01. Initial development of code
+# Version 0.2: 2023-11-01. Refactoring for wider distribution.
+
+
 
 #### FUNCTIONS ####
 MKZs <- function(x) {

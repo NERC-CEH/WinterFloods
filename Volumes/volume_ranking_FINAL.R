@@ -7,7 +7,8 @@
 # Version 0.1: 2024-01-01. Initial development of code
 # Version 0.2: 2024-02-01. Refactoring for wider distribution.
 
-setwd("P:/08458 CWI-EA 2019-21 Flood Review")
+
+#### NOTE: source flow and level data not supplied as a data product in this project.
 
 ##### SETUP #####
 library(dplyr)
@@ -19,15 +20,15 @@ library(readxl)
 rank2 <- function(a,b){rank(-1*c(a,b), ties="min", na.last="keep")[1]}
 
 ##### Key Arguments #####
-key_details_filename <- "./Data/Master Station Listings UKCEH_post queries.xlsx"
+key_details_filename <- "./Data/Metadata/Master Station Listings.xlsx"
 key_details_long_filename <- ""
-key_storms_filename <- "./Data/Context/Key Storms.csv"
+key_storms_filename <- "./Data/Context/key_storms_out_with_ranks.csv"
 id_column_kd <- "Gauge ID"
 plot_folder <- ""
 locations_filename <- ""
-catchments_filename <- "./Data/context/all_locations_rain.shp"
+catchments_filename <- "./Data/Context/all_locations_rain.shp"
 volumes_folder <- "./Data/Volumes/"
-event_volumes_filename <- "./Data/Volumes/Specified_event_volumes_0.csv"
+event_volumes_filename <- "./Data/Volumes/Specified_event_volumes.csv"
 
 ##### READ IN DATA #####
 key_details <- readxl::read_xlsx(key_details_filename, sheet=5)[,1:22] %>%

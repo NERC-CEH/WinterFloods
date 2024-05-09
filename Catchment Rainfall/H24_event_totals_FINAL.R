@@ -1,29 +1,33 @@
 ### giaves 2023-10-25
+# 08458: Winter Floods 2019-21
+
 # Find event totals for given events
 
+# Version 0.1: 2023-10-25. Initial development of code
+# Version 0.2: 2023-11-01. Refactoring for wider distribution.
+
+
 #### SETUP ####
-rm(list = ls())
-Sys.setenv(tz = "UTC")
-
-setwd("P:/08458 CWI-EA 2019-21 Flood Review")
-
 library(zoo)
 library(readxl)
 
 #### KEY FILEPATHS ####
-pluvial_rain_meta <- "Code/H24/Raingauge_table.csv"
-pluvial_rain_folder <- "Data/H24"
-pluvial_total_out <- "Data/H24 results/CatAvg_rainfall_totals.csv"
-key_details_filename <- "Data/Extra H24/Places_and_dates_rainfall.xlsx"
+pluvial_rain_meta <- "./Data/Catchment Rainfall Event Data/Raingauge_table.csv"
+pluvial_rain_folder <- "Data/Catchment Rainfall Event Data/H24 rainfall data"
+pluvial_total_out <- "./Data/Catchment Rainfall Event Data/CatAvg_rainfall_totals.csv"
+key_details_filename <- "./Data/Catchment Rainfall Event Data/Places_and_dates_rainfall.xlsx"
 
+H24_19_filepath <- "./Data/Catchment Rainfall Event Data/20231111_0046_average_catavg_H24_historical_All_Locations_2019.csv"
+H24_20_filepath <- "./Data/Catchment Rainfall Event Data/20231111_0046_average_catavg_H24_historical_All_Locations_2020.csv"
+H24_21_filepath <- "./Data/Catchment Rainfall Event Data/20231111_0046_average_catavg_H24_historical_All_Locations_2021.csv"
 
 #### READ IN DATA ####
 RG_Ev <- readxl::read_xlsx(key_details_filename)
 RG_Ev <- as.data.frame(RG_Ev)
 
-H24_19 <- read.csv("Data/Extra H24/20231111_0046_average_catavg_H24_historical_All_Locations_2019.csv", header = FALSE)
-H24_20 <- read.csv("Data/Extra H24/20231111_0046_average_catavg_H24_historical_All_Locations_2020.csv", header = FALSE)
-H24_21 <- read.csv("Data/Extra H24/20231111_0046_average_catavg_H24_historical_All_Locations_2021.csv", header = FALSE)
+H24_19 <- read.csv(H24_19_filepath, header = FALSE)
+H24_20 <- read.csv(H24_20_filepath, header = FALSE)
+H24_21 <- read.csv(H24_21_filepath, header = FALSE)
 
 H24_all <- rbind(H24_19, H24_20, H24_21)
 rm(H24_19, H24_20, H24_21)

@@ -7,9 +7,9 @@
 # Version 0.1: 2023-02-16. Initial development of code
 # Version 0.2: 2023-11-01. Refactoring for wider distribution.
 
-setwd("P:/08458 CWI-EA 2019-21 Flood Review")
+### NOTE: source raingauge data not given as data product in this project.
 
-monthly_rain_filepath <- "./Data/rainfall_monthly"
+monthly_rain_filepath <- "./Data/Rainfall_long_duration" 
 
 ##### SETUP 
 library("lmom")

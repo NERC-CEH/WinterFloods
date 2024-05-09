@@ -1,5 +1,12 @@
+# Adam Griffin 2024-01-31
+# 08458: Winter Floods 2019-21
 
-setwd("P:/08458 CWI-EA 2019-21 Flood Review")
+# Compute confidence intervals on peak flow using bootstrapping methods
+
+# Version 0.1: 2024-01-31. Initial development of code
+# Version 0.2: 2024-02-14. Refactoring for wider distribution.
+
+
 ##### SETUP
 library(dplyr)
 library(lubridate)
@@ -8,13 +15,11 @@ library(tidyverse)
 library(readxl)
 
 key_details_filename <- "./Data/Context/key_details_with_gw_cosmos.csv"
-key_details2_filename <- "./Data/Master Station Listings UKCEH.xlsx"
-peak_flow_filename <- "./Data/Tables_For_Reporting/Table_FEH_Stat.csv"
-uncert_filename <- "./Data/uncertQT.csv"
+key_details2_filename <- "./Data/Metadata/Master Station Listings.xlsx"
+peak_flow_filename <- "./Data/Flow/FEH_AMAX_flood_frequency_analysis.csv"
 ess_filename <- "Data/WINFAP-ESS/ESS-on_NRFA-11.csv"
 
 peak_flow <- readr::read_csv(peak_flow_filename)
-uncert <- readr::read_csv(uncert_filename)
 ess_in <- readr::read_csv(ess_filename)
 key_details <- readr::read_csv(key_details_filename)
 
@@ -28,8 +33,6 @@ peak_flow <- peak_flow %>%
 peak_flow$LB <- NA
 peak_flow$UB <- NA
 M <- 300
-
-peak_flow <- peak_flow %>% dplyr::filter(Area == "WestMidlands")
 
 key_details <- key_details2
 
@@ -67,34 +70,4 @@ peak_flow$ci_print <- paste0(round(peak_flow$RP,1), " (", peak_flow$LB, " - ", p
 
 peak_flow$ci_print[peak_flow$`AEP Preferred`=="No AMAX"] <- "No AMAX"
 
-write_csv(peak_flow, "./Data/WM_PF.csv")
-
-
-df <- data.frame(QT=QT)
-ulb <- apply(df, 1, \(x){quantile(x, c(0.025, 0.975))})
-df$lb <- ulb[1,]
-df$ub <- ulb[2,]
-
-
-
-h <- splinefun(df$lb, df$)
-g <- splinefun(df$ub, df$RP)
-
-ggplot(df) +
-  geom_line(aes(x=RP, y=QT)) +
-  geom_line(aes(x=RP, y=LB), col="red") +
-  geom_line(aes(x=RP, y=UB, col="red"))
-
-
-inverse = function (f, lower = -100, upper = 100) {
-  function (y) uniroot((function (x) f(x) - y), lower = lower, upper = upper)[1]
-}
-
-> square_inverse = inverse(function (x) x^2, 0.1, 100)
-
-
-
-
-
-
-
+readr::write_csv(peak_flow, "./Data/WM_PF.csv")

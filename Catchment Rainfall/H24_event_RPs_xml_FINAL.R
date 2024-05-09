@@ -1,23 +1,19 @@
 ### giaves 2023-10-25
-# Find event return periods for depths extracted by Pluvial_event_totals.R
+# 08458: Winter Floods 2019-21
+
+# Find event return periods for depths extracted by H24_event_totals.R
+
+# Version 0.1: 2023-10-25. Initial development of code
+# Version 0.2: 2023-11-01. Refactoring for wider distribution.
 
 
 #### SETUP ####
-rm(list = ls())
-Sys.setenv(tz = "UTC")
-
 library("xml2")
 
-setwd("P:/08458 CWI-EA 2019-21 Flood Review")
-
-
-
 #### KEY FILEPATHS ####
-rainfall_events_in <- "Data/H24 results/CatAvg_rainfall_totals.csv"
+rainfall_events_in <- "Data/Catchment Rainfall Event Data/CatAvg_rainfall_totals.csv"
 feh_in <- "P:/Flood Estimation Handbook/FEH Data/WINFAP-FEH_v12.0.2"
-rainfall_FEH_out <- "Data/H24 results/CatAvg_rainfall_RPs_from_XMLs.csv"
-
-partial_completion_backup <- "Code/H24/Extracted_rainfall_from_csv.Rda"
+rainfall_FEH_out <- "Data/Catchment Rainfall Event Data/CatAvg_rainfall_RPs_from_XMLs.csv"
 
 
 #### READ IN DATA ####
@@ -76,7 +72,8 @@ if (file.exists(partial_completion_backup)) {
 #################################
 
 source("Code/Pluvial/I4PLA.R")
-RPList <- c(1.3, 1.58, 2, 3, 6, 10, 18, 31, 56, 100, 180, 310, 560, 1000, 1800, 3100, 5600, 10000, 18000, 31000, 56000, 100000)
+RPList <- c(1.3, 1.58, 2, 3, 6, 10, 18, 31, 56, 100, 180, 310, 560, 1000,
+			1800, 3100, 5600, 10000, 18000, 31000, 56000, 100000)
 
 RP_AMAX_1h <- rep(NA, NEv)
 for (i in 1:NEv) {
@@ -104,7 +101,8 @@ for (i in 1:NEv) {
     X1h <- 4
   }
   
-  RP_AMAX_1h[i] <- I4PLA(Extracted_rainfall_from_csv[1, M1h:X1h , i], RPList[M1h:X1h], Events$Depth.1h[i])
+  RP_AMAX_1h[i] <- I4PLA(Extracted_rainfall_from_csv[1, M1h:X1h , i],
+						RPList[M1h:X1h], Events$Depth.1h[i])
   
 }
 
@@ -134,7 +132,8 @@ for (i in 1:NEv) {
     X6h <- 4
   }
   
-  RP_AMAX_6h[i] <- I4PLA(Extracted_rainfall_from_csv[2, M6h:X6h , i], RPList[M6h:X6h], Events$Depth.6h[i])
+  RP_AMAX_6h[i] <- I4PLA(Extracted_rainfall_from_csv[2, M6h:X6h , i],
+						RPList[M6h:X6h], Events$Depth.6h[i])
   
 }
 
@@ -164,7 +163,8 @@ for (i in 1:NEv) {
     X1d <- 4
   }
   
-  RP_AMAX_1d[i] <- I4PLA(Extracted_rainfall_from_csv[3, M1d:X1d , i], RPList[M1d:X1d], Events$Depth.1d[i])
+  RP_AMAX_1d[i] <- I4PLA(Extracted_rainfall_from_csv[3, M1d:X1d , i],
+						RPList[M1d:X1d], Events$Depth.1d[i])
   
 }
 
@@ -194,7 +194,8 @@ for (i in 1:NEv) {
     X4d <- 4
   }
   
-  RP_AMAX_4d[i] <- I4PLA(Extracted_rainfall_from_csv[4, M4d:X4d , i], RPList[M4d:X4d], Events$Depth.4d[i])
+  RP_AMAX_4d[i] <- I4PLA(Extracted_rainfall_from_csv[4, M4d:X4d , i],
+						RPList[M4d:X4d], Events$Depth.4d[i])
   
 }
 

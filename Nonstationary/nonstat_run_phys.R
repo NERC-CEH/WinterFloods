@@ -1,14 +1,20 @@
+#### Griffin, Adam. 2024-01-15
+# 08458: Winter Floods 2019-21
+
+# Main contributor: Adam Griffin
+# Info: Extra plotting functions for nonstationary flood frequency analysis
+
+# Version 0.1: 2024-01-15. Initial development of code
+
 library(nonstat)
 
-folder <- "P:/08458 CWI-EA 2019-21 Flood Review/Code/NonstationaryFFA/Data/NONST"
 dist <- "GEV"
 RPs <- c(2, 10, 20, 50, 100)
 CI <- 90
 
-KeyEvents <- readr::read_csv(
-  "P:/08458 CWI-EA 2019-21 Flood Review/Data/KeyDetails/KeyDetails_Long.csv")
+KeyEvents <- readr::read_csv("./Data/Nonstationary/KeyDetails_Long.csv")
 
-KeyDetails <- readr::read_csv("P:/08458 CWI-EA 2019-21 Flood Review/Data/MSL_post queries.csv")
+KeyDetails <- readr::read_csv(".Data/Metadata/Master Station Listing.csv")
 
 KeyEvents <- KeyEvents %>% 
   dplyr::filter(str_starts(`Non-stationary probability analysis (physical covariates)`, "Y"))

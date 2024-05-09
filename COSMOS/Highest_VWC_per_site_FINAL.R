@@ -1,13 +1,15 @@
 ### giaves 2023-10-12
+# 08458: Winter Floods 2019-21
+
+# Main contributor: Gianni Vesuviano, UKCEH
 # Find single highest COSMOS volumetric water content for each site
 
+# Version 0.1: 2024-01-15. Initial development of code
 
 #### SETUP ####
-rm(list = ls())
-setwd("P:/08458 CWI-EA 2019-21 Flood Review")
 
 #### KEY FILEPATHS ####
-cosmos_daily_folder <- "Data/COSMOS-UK_data/daily"
+cosmos_daily_folder <- "Data/COSMOS/daily"
 cosmos_outfile <- "Data/COSMOS-UK_data/Max_VWC_per_site.csv"
 
 #### READ IN DATA ####

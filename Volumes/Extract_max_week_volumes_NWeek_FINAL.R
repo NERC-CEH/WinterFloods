@@ -9,7 +9,7 @@
 # Version 0.1: 2023-09-11. Initial development of code
 # Version 0.2: 2023-11-01. Refactoring for wider distribution.
 
-setwd("P:/08458 CWI-EA 2019-21 Flood Review")
+#### NOTE: source flow and level data not supplied as a data product in this project.
 
 ##### SETUP #####
 library(zoo)
@@ -19,7 +19,7 @@ library(readr)
 
 ##### Key Arguments #####
 
-Q15_folder <- "./Data/Q_combined"
+Q15_folder <- "./Data/Flow/Q_combined"
 
 Q15list <- list.files(path = Q15_folder, full = TRUE)
 Q15names <- list.files(path = Q15_folder, full = FALSE)

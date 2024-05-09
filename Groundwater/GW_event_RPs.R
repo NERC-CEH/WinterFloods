@@ -1,17 +1,34 @@
+#### Griffin, Adam. 2023-09-13
+# 08458: Winter Floods 2019-21
+
+# Main contributor: GV
+# Info: Fit GEV distribution to groundwater AMAX/AMIN
+
+# Version 0.1: 2023-09-13. Initial development of code
+# Version 0.2: 2023-11-01. Refactoring for wider distribution.
+
+### NOTE: source groundwater data not given as data product in this project.
+
+#### SETUP
 library(tidyverse)
 library(texmex)
 library(lmomco)
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
 
-setwd("P:/08458 CWI-EA 2019-21 Flood Review/Code/Groundwater")
-
+#### READ IN DATA
 allAMAX <- readr::read_csv(
-  "P:/08458 CWI-EA 2019-21 Flood Review/Data/Groundwater/FullRecord_Level_AMAX.csv")
+  ".Data/Groundwater/FullRecord_Level_AMAX.csv")
 
 allAMIN <- readr::read_csv(
-  "P:/08458 CWI-EA 2019-21 Flood Review/Data/Groundwater/FullRecord_Dip_AMIN.csv")
+  "./Data/Groundwater/FullRecord_Dip_AMIN.csv")
 
 events <- readr::read_csv(
-  "P:/08458 CWI-EA 2019-21 Flood Review/Data/Groundwater/Event_Antecedent_max_level_or_min_dip2.csv")
+  "./Data/Groundwater/Event_Antecedent_max_level_or_min_dip.csv")
+  
+
 allAMAX$Mrow <- 1:nrow(allAMAX)
 events$Nrow <- 1:nrow(events)
 
@@ -28,6 +45,8 @@ V <- sort(unique(events$GW.Gauge))
 V <- V[V %in% U]
 for(i in seq_along(V)){
   print(paste(i,V[i]))
+  
+  ### Data for 1 station
   AMAX_1stn <- allAMAX %>% dplyr::filter(GW.Gauge == V[i])
   am <- AMAX_1stn %>% select(WY, Level_AMAX)
   DIP_1stn <- allAMIN %>% dplyr::filter(GW.Gauge==V[i])
@@ -37,6 +56,8 @@ for(i in seq_along(V)){
   names(ev) <- c("WY", "Level_AMAX", "Dip_AMIN", "Nrow")
   
   if(any(!is.na(ev$Level_AMAX))){
+  
+	### Fit GEV distribution
     AMAX_event_rank <- sapply(ev$Level_AMAX, \(x){2 + nrow(AMAX_1stn) - rank(c(x, am$Level_AMAX))[1]})
     AMAX_distn <- evm(Level_AMAX, data=am, family=gev)
     rpAMAX <- 1-texmex::pgev(q=ev$Level_AMAX, mu=AMAX_distn$par[1],  sigma=AMAX_distn$par[2],  xi=AMAX_distn$par[3])
@@ -47,6 +68,9 @@ for(i in seq_along(V)){
     am[nrow(am)+1,] <- am[nrow(am),]
     am$WY[nrow(am)] <- am$WY[nrow(am)]+1
     am$plotdate <- ymd(paste0(am$WY,"-01-01"))
+	
+	#### PLOTTING
+	 
     g <- ggplot(am) + 
       geom_step(aes(x=plotdate, y=Level_AMAX)) +
       geom_point(data=ev, aes(x=WY, y=Level_AMAX), col="red", pch=4, size=1.5, stroke=1.5) +
@@ -60,6 +84,8 @@ for(i in seq_along(V)){
     
   }
   if(any(!is.na(ev$Dip_AMIN))){
+  
+	### GEV fitting
     ev$DipAMIN_fit <- -1*ev$Dip_AMIN
     dip$DipAMIN_fit <- -1*dip$Dip_AMIN
     AMIN_event_rank <- sapply(ev$Dip_AMIN, \(x){rank(c(x, dip$Dip_AMIN))[1]})
@@ -72,6 +98,8 @@ for(i in seq_along(V)){
     dip[nrow(dip)+1,] <- dip[nrow(dip),]
     dip$WY[nrow(dip)] <- dip$WY[nrow(dip)]+1
     dip$plotdate <- ymd(paste0(dip$WY,"-01-01"))
+	
+	#### PLOTTING 
     h <- ggplot(dip) + 
       geom_step(aes(x=plotdate, y=Dip_AMIN)) +
       geom_point(data=ev, aes(x=WY, y=Dip_AMIN), col="red", pch=4, size=1.5, stroke=1.5) +
@@ -99,7 +127,7 @@ events_level <- events %>%
 events_level$empirical_AMAX <- signif(events_level$empirical_AMAX, 3)
 events_level$GEV_AMAX <- signif(events_level$GEV_AMAX, 3)
 
-write_csv(events_level, "./Data/Table_Groundwater_Level.csv")
+readr::write_csv(events_level, "./Data/Table_Groundwater_Level.csv")
 
 events_dip <- events %>%
   dplyr::filter(!is.na(rank_AMIN)) %>%
@@ -107,15 +135,5 @@ events_dip <- events %>%
 events_dip$empirical_AMIN <- signif(events_dip$empirical_AMIN, 3)
 events_dip$GEV_AMIN <- signif(events_dip$GEV_AMIN, 3)
 
-write_csv(events_dip, "./Data/Table_Groundwater_Dipped.csv")
-# 
-# 
-# events_dip <- events_out %>%  %>% select()
-# events_amax
-# 
-# 
-# f <- \(x){paste(min(x), "-", max(x))}
-# allAMAX_grouped_A <- allAMAX %>% group_by(GW.Gauge) %>% summarise(por=f(WY), reclen=n())
-# allAMAX_grouped_B <- allAMAX %>% group_by(GW.Gauge) %>% slice_max(Level_AMAX, n=1)
-# allAMAX_grouped <- full_join(allAMAX_grouped_A, allAMAX_grouped_B)
-# write_csv(allAMAX_grouped, "./Table10.csv")
+readr::write_csv(events_dip, "./Data/Table_Groundwater_Dipped.csv")
+

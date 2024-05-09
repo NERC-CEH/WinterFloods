@@ -1,13 +1,20 @@
-### giaves 2023-09-13
-# Load each groundwater record, extract WY AMAX
+#### giaves 2023-09-13
+# 08458: Winter Floods 2019-21
+
+# Main contributor: GV
+# Info: Load each groundwater record, extract WY AMAX
+
+# Version 0.1: 2023-09-13. Initial development of code
+# Version 0.2: 2023-11-01. Refactoring for wider distribution.
+
+### NOTE: source groundwater data not given as data product in this project.
+
 
 #### SETUP ####
-rm(list = ls())
-setwd("P:/08458 CWI-EA 2019-21 Flood Review")
 library(zoo)
 library(tidyverse)
 library(lubridate)
-Sys.setenv(tz = "utc")
+
 
 Mode <- function(x) {
   ux <- unique(x)
@@ -15,7 +22,7 @@ Mode <- function(x) {
 }
 
 #### KEY FILEPATHS ####
-gw_data_folder <- "Data/Groundwater/CumbriaLancashire/CumbriaLancashire"
+gw_data_folder <- "Data/Groundwater"
 gw_fullrec_folder <- "./Data/Groundwater/FullRecord/"
 
 GWlist <- list.files(path = gw_data_folder, full = TRUE)

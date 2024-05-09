@@ -1,8 +1,26 @@
+#### Griffin, Adam. 2023-12-01
+# 08458: Winter Floods 2019-21
+
+# Main contributor: Adam Griffin
+# Info: Rate of rise plots
+
+# Version 0.1: 2023-12-01. Initial development of code
+# Version 0.2: 2023-12-08. Refactoring for wider distribution.
+
+
+#### SETUP ####
 library(tidyverse)
+library(sf)
+library(ggplot2)
 
-AllXY <- read_csv("P:/08458 CWI-EA 2019-21 Flood Review/Data/Locations/AllShapefiles_Grid References.csv")
-AllNames <- read_csv("P:/08458 CWI-EA 2019-21 Flood Review/Data/MSL_post queries.csv", locale=locale(encoding="latin1"))
 
+### READ IN DATA ##
+
+AllXY <- read_csv("./Data/Locations/AllShapefiles_Grid References.csv")
+AllNames <- read_csv(".Data/Master Station Listings.csv")
+hyd_area <- read_sf("/Data/Shapefiles/uk_outline_1000m.shp")
+
+# Align grid references
 AllNames$X <- NA
 AllNames$Y <- NA
 
@@ -19,19 +37,13 @@ for(i in 1:nrow(AllNames)){
   }
 }
 
-
-library(sf)
-library(ggplot2)
-hyd_area <- read_sf("P:/08458 CWI-EA 2019-21 Flood Review/Data/Locations/uk_outline_1000m.shp")
-
 AllNames <- AllNames[AllNames$`Gauge ID` %in% EventStage_table$Station,]
 ES <- EventStage_table %>% group_by(Station) %>% summarise(maxrank=min(rank1), trend=min(trend))
 
 
-
+# Get ROR trends from data
 AllNames$maxrank <- NA
 AllNames$ror_trend <- NA
-
 
 for(i in 1:nrow(AllNames)){
   j <- which(ES$Station == AllNames$`Gauge ID`[i])
@@ -41,6 +53,8 @@ for(i in 1:nrow(AllNames)){
 AllNames$ror_signif <- 1*(AllNames$ror_trend < 0.05)
 AllNames <- st_as_sf(AllNames,coords = 28:29)
 
+
+#### Plotting ###
 png("./Plots/makrank.png", width=80, height=80, units="mm", pointsize=10, res=300)
 ggplot(hyd_area) +
   geom_sf() +

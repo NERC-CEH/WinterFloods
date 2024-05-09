@@ -2,9 +2,9 @@
 # 08458: Winter Floods 2019-21
 
 # Main contributor: Adam Griffin
-# Info: Script including functions to perform cluster analysis of POT series.
+# Info: Script to perform cluster analysis of POT series.
 
-# Version 0.1: 2023-06-01. Initial development of code
+# Version 0.1: 2023-09-01. Initial development of code
 # Version 0.2: 2023-11-01. Refactoring for wider distribution.
 
 ##### SETUP
@@ -33,11 +33,13 @@ DAY_TOLERANCE <- 5 # 5 day tolerance of stated event date
 KeyDetails <- readr::read_csv(KeyDetails_filename) # one station per row
 KeyDetails_long <- readr::read_csv(KeyDetails_long_filename) # one event per row
 
-POT_database <- rreadr::read_csv(POT_database_filename,
+POT_database <- readr::read_csv(POT_database_filename,
   col_names = c("STATION", "DATE_TIME", "VALUE", "FLAG"),
   col_types = "ccdc"
 )
 
+
+## Preallocate results columns
 KeyDetails_long$PoissonRate_1yr <- NA
 KeyDetails_long$Signif_1yr <- FALSE
 KeyDetails_long$PoissonRate_2yr <- NA
@@ -48,6 +50,7 @@ L <- unique(POT_database[ID_col_POT])
 # station identifiers in the POT database should match those in the summary file.
 
 for (i in seq_along(L)) {
+	# find the right station
   stn <- L[i]
   ww <- which(KeyDetails[ID_col] == stn)
   POT_1stn <- POT_database %>%
@@ -57,6 +60,7 @@ for (i in seq_along(L)) {
   KD_1stn <- KeyDetails_long %>%
     dplyr::filter(`Gauge ID` == KeyDetails$`Gauge ID`[ww])
   for (bw_yr in c(1 * 365, 2 * 265)) {
+  # perform cluster analysis on POT data
     clust1 <- denclust(POT_1stn$DATE_TIME,
       bwi = bw_yr,
       daysNotSeconds = F,
@@ -65,6 +69,7 @@ for (i in seq_along(L)) {
       plotfilename =
         paste0(Plot_folder, KeyDetails$`Gauge ID`[ww], "_", bw_yr, "_yr.png")
     )
+	# update output object
     clust1$bwi <- bw_yr
     clust1$gaugeID <- KeyDetails[ID_col_KD][i]
     cluster_list[[length(cluster_list) + 1]] <- clust1
@@ -74,6 +79,7 @@ for (i in seq_along(L)) {
       kd_extended = clust1$density_out[, 2],
       date = as.Date(clust1$density_out[, 1])
     )
+	# Check density object for reporting
     DO <- clust1$density_out
     for (j in seq_len(nrow(KD_1stn))) {
       w_days <- which(abs(lubridate::difftime(DO$date, KD_1stn$EventDate[j],
@@ -92,5 +98,6 @@ for (i in seq_along(L)) {
   }
 }
 
-save(cluster_list, file = paste0("./Data/Cluster_list.RDa"))
-write_csv(KeyDetails_long, file = paste0(Plot_folder, "KeyDetails_out.csv"))
+#### WRITE OUT DATA ####
+
+readr::write_csv(KeyDetails_long, file = paste0(Plot_folder, "KeyDetails_out.csv"))

@@ -5,15 +5,16 @@
 # Version 0.1: 2023-09-01. Initial development of code
 # Version 0.2: 2023-11-01. Refactoring for wider distribution.
 
-setwd("P:/08458 CWI-EA 2019-21 Flood Review")
+
 ##### SETUP #####
 library(tidyverse)
 library(readr)
 library(readxl)
+library(lfstat)
 
 ##### Key arguments #####
-KeyDetails_long_filepath <- "./Data/KeyDetails/KeyDetails_long.csv"
-Master_details_filepath <- "./Data/Master Station Listings UKCEH_post queries.xlsx"
+KeyDetails_long_filepath <- "./Data/Metadata/KeyDetails_long.csv"
+Master_details_filepath <- "./Data/Metadata/Master Station Listings.xlsx"
 all_amax_filepath <- "./Data/all_level_amax.csv"
 
 ##### Functions #####
@@ -59,4 +60,4 @@ KeyDetails_final <- KeyDetails %>%
   filter(`Event ranking` =="Y") %>%
   select(Area, `Gauge ID`, EventDate, EventS, IN_AMAX, rank, empiricalAEP)
 
-write_csv(KeyDetails_final, "./Data/Tables_for_Reporting/Table_Level_ranking2.csv")
+readr::write_csv(KeyDetails_final, "./Data/Tables_for_Reporting/Table_Level_ranking2.csv")

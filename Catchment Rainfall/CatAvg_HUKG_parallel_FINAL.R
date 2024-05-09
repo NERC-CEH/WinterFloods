@@ -15,10 +15,11 @@ library(sf)
 ca <- as.numeric(commandArgs(trailingOnly = TRUE))[1]
 
 data_dir <- "" # fill with the folder with nrfa catchments
-event_info_filename <- paste(data_dir, "WinterFloodsNRFA.csv", sep = "/")
+event_info_filename <- "" #fill with the events metadata filepath
+NRFA_catchments_filename <- paste0(data_dir,"")
 
 
-NRFAshp <- sf::st_read(paste0(data_dir,"./nrfa_all_catchments.shp"))
+NRFAshp <- sf::st_read(NRFA_catchments_filename)
 WinterFloods <- readr::read_csv(event_info_filename)
 
 

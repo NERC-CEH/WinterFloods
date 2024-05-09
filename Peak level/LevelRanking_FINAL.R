@@ -5,6 +5,8 @@
 # Version 0.1: 2023-09-01. Initial development of code
 # Version 0.2: 2024-02-01. Refactoring for wider distribution.
 
+#### Full level data not supplied. Add to folder Data/Level.
+
 #### SETUP ####
 library(tidyverse)
 library(RODBC)
@@ -21,11 +23,11 @@ lfwy <- \(x){
 rank2 <- \(x){rank(-1*x, ties="min")}
 
 ##### Key arguments #####
-KeyDetails_long_filepath <- "./Data/KeyDetails/KeyDetails_long.csv"
-Master_details_filepath <- "./Data/Master Station Listings UKCEH_post queries.xlsx"
-all_amax_filepath <- "./Data/all_level_amax.csv"
-NRFA_amax_wide_filepath <- "./Data/NRFA_PF_V12/amax.csv"
-stage_AMAX_folder <- "P:/08458 CWI-EA 2019-21 Flood Review/Data/SG WYearAMAX"
+KeyDetails_long_filepath <- "./Data/Metadata/KeyDetails_long.csv"
+Master_details_filepath <- "./Data/Metadata/Master Station Listings.xlsx"
+all_amax_filepath <- "./Data/Ranks of all_level_amax.csv"
+NRFA_amax_wide_filepath <- "./Data/Flow/amax_PF12.csv"
+stage_AMAX_folder <- "./Data/Level"
 
 #### DATA IN ####
 KeyDetails <- readr::read_csv(KeyDetails_long_filepath )

@@ -6,8 +6,7 @@
 # Version 0.1: 2023-12-16. Initial development of code
 # Version 0.2: 2024-02-01. Refactoring for wider distribution.
 
-
-setwd("P:/08458 CWI-EA 2019-21 Flood Review")
+#### NOTE: Source level and flow data not supplied as a data product in this project.
 
 ##### SETUP
 library(dplyr)
@@ -30,11 +29,11 @@ mk <- \(x,y){
 }
 
 ##### Key Arguments #####
-key_details_filename <- "./Data/Master Station Listings UKCEH_post queries.xlsx"
+key_details_filename <- "./Data/Metadata/Master Station Listings.xlsx"
 key_details_long_filename <- ""
 
-ror_folderS1 <- "./Code/RateOfRise/Data/Sg_combined"
-ror_folderQ1 <- "./Code/RateOfRise/Data/Q_combined"
+ror_folderS1 <- "./Data/RateOfRise/Sg_combined"
+ror_folderQ1 <- "./Data/RateOfRise/Q_combined"
 
 periods <- c(0.25, 0.5, 1, 2, 4, 6)
 
@@ -42,8 +41,8 @@ periods <- c(0.25, 0.5, 1, 2, 4, 6)
 
 
 ##### READ IN DATA #####
-ror_filesS1 <- list.files(ror_folderS1, pattern="_AMAX.csv", full.names = T) #S files = stage
-ror_filesQ1 <- list.files(ror_folderQ1, pattern="_AMAX.csv", full.names = T) #Q files = flow
+ror_filesS1 <- list.files(ror_folderS1, pattern=".csv", full.names = T) #S files = stage
+ror_filesQ1 <- list.files(ror_folderQ1, pattern=".csv", full.names = T) #Q files = flow
 
 # get station numbers from filenames
 ror_namesS1 <- sapply(ror_filesS1, \(x){str_remove(str_split_i(x, "[.//_]+", i=7), "^0+")})

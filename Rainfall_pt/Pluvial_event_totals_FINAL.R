@@ -1,20 +1,23 @@
-### giaves 2023-10-25
-# Find event totals for given events
+#### giaves. 2023-10-25
+# 08458: Winter Floods 2019-21
+
+# Main contributor: GV
+# Info: Find event totals for given events
+
+# Version 0.1: 2023-10-25. Initial development of code
+# Version 0.2: 2023-11-01. Refactoring for wider distribution.
+
+### NOTE: source rainfall data not given as data product in this project.
 
 #### SETUP ####
-rm(list = ls())
-Sys.setenv(tz = "UTC")
-
-setwd("P:/08458 CWI-EA 2019-21 Flood Review")
-
 library(zoo)
 library(readxl)
 
 #### KEY FILEPATHS ####
-pluvial_rain_meta <- "Code/Pluvial/Raingauge_table.csv"
-pluvial_rain_folder <- "Data/Pluvial"
-pluvial_total_out <- "Data/Pluvial/Point_rainfall_totals.csv"
-key_details_filename <- "Data/Master Station Listings UKCEH_post queries.xlsx"
+pluvial_rain_meta <- "Data/Point Rainfall/Raingauge_table.csv"
+pluvial_rain_folder <- "Data/Point Rainfall" ### NOTE: source rainfall data not given as data product in this project.
+pluvial_total_out <- "Data/Point rainfall/Point_rainfall_totals.csv"
+key_details_filename <- "Data/Metadata/Master Station Listings.xlsx"
 
 
 #### READ IN DATA ####

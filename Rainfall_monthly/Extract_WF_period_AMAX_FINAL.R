@@ -1,15 +1,24 @@
 ### giaves 2023-10-09
+# 08458: Winter Floods 2019-21
+
+# Main contributor: Gianni Vesuviano
 # Read catchment-average daily rainfalls, find 30-, 60-, 90- and 180-day maxima with arbitrary start times within June 2019-June 2021
+
+# Version 0.1: 2023-10-09. Initial development of code
+# Version 0.2: 2023-11-01. Refactoring for wider distribution.
+
+### NOTE: source raingauge data not given as data product in this project.
+
 
 #### SETUP ####
 rm(list = ls())
-setwd("P:/08458 CWI-EA 2019-21 Flood Review")
+
 library("zoo")
 library("readxl")
 
 ##### KEY FILEPATHS ####
-keydetails_filepath <- "Data/Master Station Listings UKCEH_post queries.xlsx"
-catchment_rain_in <- "Data/HadUK-Grid_CatAvgDailyRain"
+keydetails_filepath <- "Data/Metadata/Master Station Listings.xlsx"
+catchment_rain_in <- "Data/HadUK-Grid_CatAvgDailyRain" ### NOTE: source raingauge data not given as data product in this project.
 
 NDAY <- 30
 

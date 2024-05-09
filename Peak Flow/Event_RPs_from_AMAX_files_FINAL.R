@@ -7,14 +7,11 @@
 # Version 0.1: 2023-08-21. Initial development of code
 # Version 0.2: 2023-11-01. Refactoring for wider distribution.
 
-
-setwd("P:/08458 CWI-EA 2019-21 Flood Review")
-
 ##### SETUP #####
 library(readr)
 
 #### Key arguments #####
-NRFA_folderpath <- "./WINFAP-FEH_v12"
+NRFA_folderpath <- "./WINFAP-FEH_v12" # WINFAP internal files
 ESS_data_filepath <- "Data/WINFAP-ESS/ESS-on_NRFA-11.csv"
 list_of_stations <- "Code/WINFAP-ESS/Stations_not_on_batch_AMAX.csv"
 

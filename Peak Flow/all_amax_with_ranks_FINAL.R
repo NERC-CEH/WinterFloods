@@ -12,9 +12,9 @@ library(readxl)
 library(readr)
 
 ##### Key arguments #####
-key_details_filepath <- "Data/Master Station Listings UKCEH_post queries.xlsx"
-all_amax_filepath <- "Data/NRFA_AMAX_POT/All_AM_valid_with_dates.txt"
-all_amax2_filepath <-"Data/Peaks from Continuous/AMAXs_QWYearAMAX_vs_Q15.csv"
+key_details_filepath <- "Data/Metadata/Master Station Listings.xlsx"
+all_amax_filepath <- "Data/Flow/All_AM_valid_with_dates.txt"
+all_amax2_filepath <-"Data/Flow/AMAXs_QWYearAMAX_vs_Q15.csv"
 
 Master <- readxl::read_excel(key_details_filepath,
                              sheet = "PostQueries_FluvialGauged")

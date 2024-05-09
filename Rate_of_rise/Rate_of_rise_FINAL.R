@@ -5,6 +5,8 @@
 # Version 0.1: 2023-07-16. Initial development of code
 # Version 0.2: 2023-11-01. Refactoring for wider distribution.
 
+#### NOTE: Source flow data not provided as a data product of this project.
+
 
 ##### SETUP
 library(lubridate)
@@ -36,12 +38,12 @@ find_peaks <- function (x, m = 3){
 data_folder <- "" # 15 minute data, 1 station per file, columns DATETIME,VALUE,FLAG
 # each file should end with _XXXX.csv where XXXX is the station identifier.
 
-KeyDetails_filepath <- ""
-KeyDetails_long_filepath <- ""
+KeyDetails_filepath <- "./Data/Metadata/Master Station Listings.xlsx"
+KeyDetails_long_filepath <- "./Data/Metadata/KeyDetails_long.csv"
 ID_col_KD <- "Gauge ID"
 date_col_KD <- "Event Date"
 period_vec <- c(0.25,0.5,1,2,4,6) # periods of rise in minutes
-data_out_folder <- ""
+data_out_folder <- "./Data/Rate of Rise"
 
 KeyDetails <- read_csv(KeyDetails_filepath) # one station per line
 KeyDetails_long <- read_csv(KeyDetails_long_filepath) # one event per line

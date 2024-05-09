@@ -1,24 +1,22 @@
 # 08458: Winter Floods 2019-21
 # Main Contributor: Gianni Vesuviano
 # Find closest COSMOS site to each river gauging station and export table
+
 # Version 1.0:  2023-11-08
 
-setwd("P:/08458 CWI-EA 2019-21 Flood Review")
 
 ##### SETUP #####
 library("readxl")
 library("rnrfa")
 
-
-
 # Load COSMOS sites and Winter Floods sites
 COSMOS <- read.csv("Data/COSMOS-UK_data/SITE_INFO.csv")
-Master <- read_excel("Data/Master Station Listings UKCEH_post queries.xlsx", sheet = "PostQueries_FluvialGauged")
+Master <- readxl::read_excel("Data/Master Station Listings UKCEH_post queries.xlsx", sheet = "PostQueries_FluvialGauged")
 Master <- Master[ , c(1, 3, 4, 7, 5, 2)]
 colnames(Master) <- c("NRFA", "Gauge", "River", "Type", "ID", "Area")
 
 # Add easting and northing from NRFA dataset
-Cat <- catalogue()
+Cat <- rnrfa::catalogue()
 Cat <- Cat[ , c("id", "easting", "northing")]
 colnames(Cat) <- c("NRFA", "Easting", "Northing")
 
@@ -44,8 +42,6 @@ for (i in 1:dim(Master)[1]) {
   Master$Northing[i] <- EN$northing[1]
   
 }
-
-GG <- list.files(path = "Data/WestMids/West Mids data/Gaugings", full = TRUE)
 
 # Fill in easting and northing for more West Mids sites
 for (i in 1:dim(Master)[1]) {
@@ -79,6 +75,9 @@ IB <- which(Master$Gauge == "IVER BRIDGE")
 Master$Easting[IB] <- 504107
 Master$Northing[IB] <- 181265
 
+
+
+# Pre-allocation of columns
 Master$Closest_COSMOS_ID <- NA
 Master$Closest_COSMOS_name <- NA
 Master$Closest_COSMOS_distance_km <- NA
@@ -89,10 +88,12 @@ COSMOS$Closest_Station_Name <- NA
 COSMOS$Closest_COSMOS_distance_km <- NA
 COSMOS$Region <- NA
 
+# Processing
 for (i in 1:dim(Master)[1]) {
   
   if (is.na(Master$Easting[i])) next()
   
+  # get Euclidean distance
   distance <- sqrt((Master$Easting[i] - COSMOS$EASTING)^2 + (Master$Northing[i] - COSMOS$NORTHING)^2) / 1000
   C <- which.min(distance)
   
@@ -105,7 +106,7 @@ for (i in 1:dim(Master)[1]) {
 for (i in 1:dim(COSMOS)[1]) {
   
   if (is.na(Master$Easting[i])) next()
-  
+  # get Euclidean distance
   distance <- sqrt((Master$Easting - COSMOS$EASTING[i])^2 + (Master$Northing - COSMOS$NORTHING[i])^2) / 1000
   C <- which.min(distance)
   COSMOS$Closest_Station[i] <- Master$ID[C]
@@ -115,9 +116,7 @@ for (i in 1:dim(COSMOS)[1]) {
   
 }
 
+#### WRITE OUT DATA ####
 
+readr::write_csv(COSMOS, "./Data/COSMOS/Closest_Station_to_each_COSMOS.csv")
 
-write_csv(COSMOS, "P:/08458 CWI-EA 2019-21 Flood Review/Data/COSMOS-UK_data/Closest_Station_to_each_COSMOS.csv")
-
-
-write.csv(Master, "P:/08458 CWI-EA 2019-21 Flood Review/Data/COSMOS-UK_data/Closest_COSMOS_to_each_station.csv", row.names = FALSE)

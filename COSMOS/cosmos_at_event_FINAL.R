@@ -16,18 +16,18 @@ library(tidyverse)
 library(readxl)
 
 ##### Key Arguments #####
-key_details_filename <- "./Data/Master Station Listings UKCEH_post queries.xlsx"
+key_details_filename <- "./Data/Master Station Listings.xlsx"
 key_details_long_filename <- ""
 key_storms_filename <- "./Data/Context/Key Storms.csv"
 id_column_kd <- "Gauge ID"
 plot_folder <- ""
 locations_filename <- ""
 catchments_filename <- ""
-cosmos_monthquarter_folder <- "./Data/COSMOS-UK_data/Ranked_MonthQuarter"
+cosmos_monthquarter_folder <- "./Data/COSMOS/Ranked_MonthQuarter"
 cosmos_match_filename <- "./Data/COSMOS-UK_data/Closest_COSMOS_to_each_station.csv"
 cosmos_metadata_filename <- "./Data/COSMOS-UK_data/Max_VWC_per_site.csv"
 
-source("./Code/SummarisingFunctions_FINAL.R")
+source("./Code/Context/SummarisingFunctions_FINAL.R")
 
 # for each station
 # for each event
@@ -77,4 +77,4 @@ for(i in seq_len(nrow(key_details))){ # for each station
 
 # convert to data_frame and save to file
 cosmos_levels_data_frame <- do.call(rbind.data.frame, cosmos_levels_out)
-write_csv(cosmos_levels_data_frame, "./Data/Context/event_cosmos_wvc.csv")
+readr::write_csv(cosmos_levels_data_frame, "./Data/Context/event_cosmos_wvc.csv")

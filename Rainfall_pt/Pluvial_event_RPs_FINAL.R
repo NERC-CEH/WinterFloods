@@ -1,19 +1,23 @@
-### giaves 2023-10-25
-# Find event return periods for depths extracted by Pluvial_event_totals.R
+#### giaves. 2023-10-25
+# 08458: Winter Floods 2019-21
+
+# Main contributor: GV
+# Info: Find event return periods for depths extracted by Pluvial_event_totals_FINAL.R
+
+# Version 0.1: 2023-10-25. Initial development of code
+# Version 0.2: 2023-11-01. Refactoring for wider distribution.
+
+### NOTE: source rainfall data not given as data product in this project.
 
 
 #### SETUP ####
-rm(list = ls())
-Sys.setenv(tz = "UTC")
-
-setwd("P:/08458 CWI-EA 2019-21 Flood Review")
 
 library(raster)
 
 
 #### KEY FILEPATHS ####
 rainfall_events_in <- "Data/Pluvial/Point_rainfall_totals.csv"
-gridded_feh_in <- "//nercwlsmb01/data/feh22_sepa/programs/6.Make_ASCII/Sample-point_dur_&_rp"
+gridded_feh_in <- "~~~~~~~/Sample-point_dur_&_rp" #### INTERNAL FILE FOR FEH22 GRIDS
 rainfall_FEH_out <- "Data/Pluvial/Point_rainfall_RPs.csv"
 
 partial_completion_backup <- "Code/Pluvial/Extracted_rainfall_from_grids.Rda"

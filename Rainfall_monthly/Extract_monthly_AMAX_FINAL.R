@@ -1,15 +1,20 @@
-### giaves 2023-02-15
-# Read catchment-average daily rainfalls, assign to water years, aggregate monthly totals, find 1, 2, 3 and 6-month maxima
+#### giaves. 2023-02-15
+# 08458: Winter Floods 2019-21
 
+# Main contributor: GV
+# Info: Read catchment-average daily rainfalls, assign to water years, aggregate monthly totals, find 1, 2, 3 and 6-month maxima
+# Version 0.1: 2023-02-15. Initial development of code
+# Version 0.2: 2023-11-01. Refactoring for wider distribution.
+
+### NOTE: source raingauge data not given as data product in this project.
 
 #### SETUP ####
-setwd("P:/08458 CWI-EA 2019-21 Flood Review")
 library("zoo")
 
 #### KEY FILEPATHS ####
 rain_in_folder <- "Data/HadUK-Grid_CatAvgDailyRain"
-rainfall_nmonth_out <- "Code/Rainfall_monthly_AMAX/Maxima_table_"
-amax_date_out <- "Code/Rainfall_monthly_AMAX/Date_of_maxima_"
+rainfall_nmonth_out <- "Data/Rainfall_long_duration/Maxima_table_"
+amax_date_out <- "Code/Rainfall_long_duration/Date_of_maxima_"
 
 #### READ IN DATA ####
 
@@ -17,7 +22,6 @@ RF <- list.files(path = rain_in_folder, pattern = "full", full.names = TRUE)
 RG <- gsub("[^0-9]", "", RF)
 
 N <- length(RF)
-
 
 # Pre-allocation
 Rain1 <- array(0, dim = c(131, N+1))

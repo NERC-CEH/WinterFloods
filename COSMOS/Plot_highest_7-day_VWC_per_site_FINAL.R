@@ -1,10 +1,13 @@
 ### giaves 2023-11-09
-# Find single highest COSMOS volumetric water content for each site
+# 08458: Winter Floods 2019-21
 
+# Main contributor: GV
+# Info: Plot highest COSMOS volumetric water content for each site
+
+# Version 0.1: 2023-11-09. Initial development of code
+# Version 0.2: 2023-11-30. Refactoring for wider distribution.
 
 #### SETUP ####
-rm(list = ls())
-setwd("P:/08458 CWI-EA 2019-21 Flood Review")
 library(viridis)
 
 #### KEY FILEPATHS ####
@@ -18,18 +21,21 @@ N <- length(CF)
 
 for (i in 1:N) {
   
+  ### Read in data
   SiteName <- unlist(strsplit(CFname[i], "_monthquarter.csv"))
   Rec <- read.csv(CF[i])[1:3]
   colnames(Rec)[1:2] <- c("Date", "VWC")
   
   WFRec <- Rec[which(Rec$Date >= "2019-06-Q1" & Rec$Date <= "2021-06-Q4"), ]
   
+  #determine ranges
   MaxVWC <- which.max(WFRec$VWC)
   
   Day <- substr(WFRec$Date[MaxVWC], 6, 10)
   
   PD <- which(substr(Rec$Date, 6, 10) == Day)
   
+  # plotting dataframe
   PlotDates <- Rec[PD, ]
   PlotDates$Year <- as.numeric(substr(PlotDates$Date, 1, 4))
   PlotDates <- PlotDates[which(!is.na(PlotDates$VWC)), ]
@@ -39,6 +45,7 @@ for (i in 1:N) {
     MN <- as.numeric(substr(Day, 1, 2))
     MQ <- substr(Day, 5, 5)
     
+	# month quarters
     MonthDays <- if (MQ == 1) "01-08" else if (MQ == 2) "09-15" else if (MQ == 3) "16-23"
     if (MQ == 4) {
       if (MN %in% c(1, 3, 5, 7, 8, 10, 12)) MonthDays <- "24-31" else MonthDays <- "24-30"
@@ -54,6 +61,7 @@ for (i in 1:N) {
   #### PLOTTING ####
   
   if(dim(PlotDates)[1] == 0){
+  # No data plot
     png(sprintf(paste0(plot_outfolder,"/%s-7-day-VWC.png"), SiteName),
         units = "mm", width = 80, height = 80, res = 600, family = "FreeSans")
     par(mar = c(0, 0, 0, 0))
@@ -61,6 +69,7 @@ for (i in 1:N) {
     text(0.5, 0.5, sprintf("No data at %s\nfor June 2019 - June 2021", gsub("_", " ", SiteName)))
     dev.off()
   }else{
+	# colour palette
     vir <- if (max(na.omit(PlotDates$Based_on_days)) == 8) rev(viridis(8)) else rev(viridis(7))
     Y20 <- which(PlotDates$Year == 2020)
     Y21 <- if(as.numeric(substr(Day, 1, 2)) <= 6) which(PlotDates$Year == 2021) else which(PlotDates$Year == 2019)

@@ -1,11 +1,16 @@
 ### giaves 2023-09-05
-# Rank COSMOS volumetric water content on each calendar day 
+# 08458: Winter Floods 2019-21
+
+# Main contributor: GV
+# Info: Rank COSMOS volumetric water content on each calendar day
+
+# Version 0.1: 2023-09-05. Initial development of code
+# Version 0.2: 2023-11-30. Refactoring for wider distribution.
+
 
 #### SETUP ####
-rm(list = ls())
 library(readr)
 library(lubridate)
-setwd("P:/08458 CWI-EA 2019-21 Flood Review")
 
 #### KEY FILEPATHS ####
 cosmos_daily_folder <- "Data/COSMOS-UK_data/daily"
