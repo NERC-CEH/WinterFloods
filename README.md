@@ -122,3 +122,16 @@ Version: 1.1 2024-07-22
 * /VolumeDDFs_FINAL.R
   * Plot DDF curves for volume relationships
 		
+# Acknowledgements
+ The Winter Floods 2019-21 Project SC35752 (Hydrological analysis of the 2019-2021 flooding), within the Environment Agency Modelling and Mapping Framework. The tool was updated in 2024.
+
+Documentation
+The main README files contain column name and type specificaton for all the necessary tables to undetake the analysis.
+
+Licences
+The code was written by UK Centre for Ecology & Hydrology.
+
+All the code is released under the Open Government Licence, except where the packages therein are based on Creative Commons licences.
+
+Support
+Please send enquiries to FloodHydrology@environment-agency.gov.uk
