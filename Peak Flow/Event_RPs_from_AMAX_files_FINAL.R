@@ -1,23 +1,28 @@
 # giaves 2023-08-21
-# 08458: Winter Floods 2019-21
+# EA project 35752: Hydrological analysis of the 2019-2021 flooding
 
 # Load compute return periods from annual maxima at NRFA stations.
 # Needs Enhanced Single Site analysis outputs from WINFAP (not included)
 
 # Version 0.1: 2023-08-21. Initial development of code
 # Version 0.2: 2023-11-01. Refactoring for wider distribution.
+# Version 1.0: 2024-07-22. Final version for wider distribution.
 
 ##### SETUP #####
 library(readr)
 
 #### Key arguments #####
-NRFA_folderpath <- "./WINFAP-FEH_v12" # WINFAP internal files
-ESS_data_filepath <- "Data/WINFAP-ESS/ESS-on_NRFA-11.csv"
-list_of_stations <- "Code/WINFAP-ESS/Stations_not_on_batch_AMAX.csv"
+NRFA_folderpath <- "./WINFAP-FEH_v11" # key files from Peak Flow release
+ESS_data_filepath <- "Data/WINFAP-ESS/ESS-on_NRFA-11.csv" # outouts of ESS analysis
+list_of_stations <- "Code/WINFAP-ESS/Stations_not_on_batch_AMAX.csv" # station not included in NRFA
 
+aep_outputs <- "Data/WINFAP-ESS/AM_return_periods_from_files.csv" 
+#AEP/RP for events based on raw flow files, not NRFA Peak Flow
+
+
+##### READ IN DATA #####
 PF <- list.files(path = NRFA_folderpath, pattern = ".am",
                  full = TRUE, recursive = TRUE)
-
 
 ESS <- readr::read_csv(ESS_data_filepath)
 Stations <- unlist(read.csv(list_of_stations))
@@ -42,15 +47,15 @@ AMS <- na.omit(AMS)
 AMS <- AMS[-1, ]
 colnames(AMS) <- c("STATION", "DATE", "FLOW", "STAGE")
 
-# Compute return period using ESS GLO parameters
+# Compute return period using ESS GLO parameters (computed in WINFAP)
 AMS$RETURN_PERIOD_AM <- 0
 for (i in 1:dim(AMS)[1]) {
   Site <- ESS[which(ESS$Station == AMS$STATION[i]), ]
   AMS$RETURN_PERIOD_AM[i] <- 1 + (1 - Site$GLOkappa/Site$GLObeta * (AMS$FLOW[i]/Site$QMED - 1))^(-1/Site$GLOkappa)
 }
 
-# conversion to POT return periods
+# conversion to POT return periods using langbein approximation
 AMS$RETURN_PERIOD_AM <- 1 / -log((AMS$RETURN_PERIOD_AM - 1) / AMS$RETURN_PERIOD_AM)
 
 ##### Save to file #####
-readr::write_csv(AMS, "Data/WINFAP-ESS/AM_return_periods_from_files.csv")
+readr::write_csv(AMS, aep_outputs)

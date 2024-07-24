@@ -1,35 +1,38 @@
 ### giaves 2023-09-11
-# 08458: Winter Floods 2019-21
+# EA project 35752: Hydrological analysis of the 2019-2021 flooding
 
 # Main contributor: Gianni Vesuviano
 # Info: Plot DDF curves for volume relationships
 
 # Version 0.1: 2023-09-11. Initial development of code
 # Version 0.2: 2024-02-01. Refactoring for wider distribution.
+# Version 1.0: 2024-07-22. Final version for wider distribution.
 
-setwd("P:/08458 CWI-EA 2019-21 Flood Review")
+
 ##### SETUP #####
-library(tidyverse)
+library(tidyverse) # contains dplyr, readr, tidyr, magrittr
 library(readxl)
 library(lmom)
 library(stringr)
 
 ##### KEY ARGUMENTS #####
-events_filepath <- "Data/Tables_for_reporting/Table_4.csv"
-key_details_filepath <- "Data/Master Station Listings UKCEH_post queries.xlsx"
-vol_combined_filepath <- \(x){
-  paste0("Data/Volumes/",x,"_week_max_Q_combined.csv")}
+events_filepath <- "Data/Tables_for_reporting/Table_4.csv" # event dates for volumes
+key_details_filepath <- "Data/Master Station Listings UKCEH_post queries.xlsx" # key metadata, one station per row
 
-col_lines <- RColorBrewer::brewer.pal(8,"BuPu")[4:8]
+vol_combined_filepath <- function(x){
+  paste0("Data/Volumes/",x,"_week_max_Q_combined.csv")} # locationn of combined flow volumes.
 
+col_lines <- RColorBrewer::brewer.pal(8,"BuPu")[4:8] # plotting palette
+
+volume_plot_folder <- "./Data/Volumes/Plots/" #filepath for saving figures
 
 
 ##### READ IN DATA #####
 Events <- readr::read_csv(events_filepath)
 
 meta_in <- readxl::read_xlsx(key_details_filepath,
-                             sheet = "PostQueries_FluvialGauged") %>%
-  select(1, 5, 2)
+                             sheet = "PostQueries_FluvialGauged") %>% 
+                             select(1, 5, 2)
 
 AMAX1WK <- readr::read_csv(vol_combined_filepath(1))
 AMAX2WK <- readr::read_csv(vol_combined_filepath(2))
@@ -54,13 +57,19 @@ for(i in seq_along(STNs)){
   
   
   # fit a GEV for each duration at this station: 1 - 8 weeks
+  ### 1-week volume
   A1 <- AMAX1WK[w, ]
   A1 <- A1[A1$Comp1 >= 0.95, ] # only choose years with over 95% complete data
+  # fit L-moments
   L1 <- lmom::pelgev(lmom::samlmu(A1$Week1))
+  # Compute ranks
   Rank1 <- sapply(Events$Vol.1.week[v], \(x){length(which(A1$Week1 > x)) + 1})
+  # Highlight events lower than whole AMAX series
   RankFlag1 <- sapply(Events$Vol.1.week[v],
                       \(x){if (x < min(A1$Week1)) "*" else ""})
+  # get 1 in x AEP from GEV
   RP1 <- 1 / (1 - lmom::cdfgev(Events$Vol.1.week[v], L1))
+  # get reduced variate for plotting
   RPx1 <- lmom::quagev(1-xaxis, L1)
   
   A2 <- AMAX2WK[w, ]
@@ -112,7 +121,7 @@ for(i in seq_along(STNs)){
                  "rp"=RP8, xax=RPx8))
   
   # save to png
-  png(paste0("./Data/Volumes/Plots/", area, "_", STNs[i], "_WM.png"),
+  png(paste0(volume_plot_folder, area, "_", STNs[i], "_WM.png"),
       width=80, height=80, units="mm", pointsize=9, res=300)
     par(mar=c(3,5,1.4,0.4), mgp=c(4,1,0))
     

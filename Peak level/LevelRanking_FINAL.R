@@ -1,11 +1,16 @@
 ##### Adam Griffin, 2023-09-01
-# 08458: Winter Floods 2019-21
+# EA project 35752: Hydrological analysis of the 2019-2021 flooding
 # Stage extraction for event ranking of stage for all data sources
 #
+
+
 # Version 0.1: 2023-09-01. Initial development of code
 # Version 0.2: 2024-02-01. Refactoring for wider distribution.
+# Version 1.0: 2024-07-22. Final version for wider distribution.
 
-#### Full level data not supplied. Add to folder Data/Level.
+#### Full 15-minute level data not supplied. Add to folder Data/Level.
+
+
 
 #### SETUP ####
 library(tidyverse)
@@ -13,35 +18,36 @@ library(RODBC)
 library(lfstat)
 library(readxl)
 library(readr)
-setwd("P:/08458 CWI-EA 2019-21 Flood Review")
 
 lfwy <- \(x){
+  #convert date to water year
   y=lfstat::water_year(x, origin=10, assign="start")
   as.numeric(levels(y)[y])
 }
 
-rank2 <- \(x){rank(-1*x, ties="min")}
+rank2 <- \(x){rank(-1*x, ties="min")} #ranks biggest as 1, smallest as N
 
 ##### Key arguments #####
-KeyDetails_long_filepath <- "./Data/Metadata/KeyDetails_long.csv"
-Master_details_filepath <- "./Data/Metadata/Master Station Listings.xlsx"
-all_amax_filepath <- "./Data/Ranks of all_level_amax.csv"
-NRFA_amax_wide_filepath <- "./Data/Flow/amax_PF12.csv"
-stage_AMAX_folder <- "./Data/Level"
+KeyDetails_long_filepath <- "./Data/Metadata/KeyDetails_long.csv" # key metadata, one event per row
+Master_details_filepath <- "./Data/Metadata/Master Station Listings.xlsx" # key metadata, one station per row
+all_amax_filepath <- "./Data/Ranks of all_level_amax.csv" # full AMAX rank data
+NRFA_amax_wide_filepath <- "./Data/Flow/amax_PF12.csv" #AMAX file as provided by the Peak Flow dataset.
+stage_AMAX_folder <- "./Data/Level" # folder for 15-minute stage data
+
+sg_files_folder <- "./Data/SG WYearAMAX" # folder of supplied stage AMAX based on hydrological year
+
+AM_IN <- "" # .csv file containing amax for all stations, one event per row, stations concatenated down table. 
+
+Final_AMAX_out <- "./Data/all_level_amax.csv" #output file for master AMAX level data 
 
 #### DATA IN ####
 KeyDetails <- readr::read_csv(KeyDetails_long_filepath )
-Master <-readxl::read_excel(Master_details_filepath, sheet="PostQueries_FluvialGauged")
+Master <-readxl::read_excel(Master_details_filepath,
+                            sheet="PostQueries_FluvialGauged")
 Master_sub <- Master %>% dplyr::select(`NRFA ID`, Area, Gauge, River, `Gauge ID`)
 
-# read in level from Oracle (Comment out if not pulling from Oracle - this is data compiled from 
-# EA supplied stage)
-
-## Oracle database
-channel <- RODBC::odbcConnect(dsn = "wla", uid = "swa2", pwd = "swa2")
-AM_IN <- RODBC::sqlQuery(channel,
-              "SELECT * FROM NRFA.DATALOAD_AMAX_STAGE WHERE BATCH_ID = 'WINTER_FLOODS_2'",
-              believeNRows=F)
+# read in extracted levels for given dates, based on level data.
+# AM_IN was stored in oracle tables, but can be supplied by .csv
 
 all_amax_oracle <- dplyr::left_join(AM_IN, Master_sub, by=c("STATION"="NRFA ID")) %>%
   select(STATION, DATE_TIME, STAGE, BATCH_ID, Area, Gauge, River, `Gauge ID`)
@@ -51,6 +57,7 @@ colnames(all_amax_oracle)[1:4] <- c("NRFA ID", "date", "stage", "source")
 all_amax_oracle <- all_amax_oracle %>%
   dplyr::group_by(`NRFA ID`) %>%
   dplyr::mutate(rank=rank2(stage))
+
 
 
 # read in from Peak Flow AMAX
@@ -78,19 +85,23 @@ colnames(all_amax_nrfa)[1] <- "NRFA ID"
 
 
 # read in level from sgAMAX files
-sgfiles <- list.files("P:/08458 CWI-EA 2019-21 Flood Review/Data/SG WYearAMAX", full.names = T)
+sgfiles <- list.files(sg_files_folder, full.names = T)
 sg_id <- sgfiles %>%
   stringr::str_split_i("[.//]+", i=5) %>%
   stringr::str_remove("^0") # strip leading zeros
 
 df_list <- list() # initialise list
 
+
+
+##### ANALYSIS #####
+
 for(i in seq_along(sgfiles)){ # for each stage file
   print(paste(i, sg_id[i]))
   df_lines <- readr::read_lines(sgfiles[i])
   w <- which(stringr::str_starts(df_lines, "Time stamp,"))
   df <- readr::read_csv(sgfiles[i], skip=w,
-                        col_names = c("DateTime", "stage", "flag"), col_types="cnc")
+                  col_names = c("DateTime", "stage", "flag"), col_types="cnc")
   
   # convert to date and get water year
   df$date <- date(lubridate::dmy_hms(df$DateTime))
@@ -105,6 +116,8 @@ for(i in seq_along(sgfiles)){ # for each stage file
 all_amax_sg <- do.call(rbind.data.frame,df_list) %>%
   dplyr::left_join(Master_sub, by=c("Gauge ID"="Gauge ID")) %>%
   dplyr::select(`NRFA ID`, date, stage, source, Gauge, `Gauge ID`, Year, rank, River, Area)
+
+
 
 # Only keep one version of each station with priority NRFA peak flow, QCd data, non-QCd stageAMAX, manually extracted AMAX
 all_amax_master <- all_amax_nrfa %>%
@@ -122,6 +135,7 @@ all_amax_master <- rbind.data.frame(all_amax_master, all_amax_master_sg)
 
 
 
+
 #extract AMAX from SG_combined
 sgfiles <- list.files(stage_AMAX_folder, full.names = T)
 sg_id <- sgfiles %>%
@@ -130,7 +144,8 @@ sg_id <- sgfiles %>%
 
 df_list <- list()
 M_sub <- Master_sub$`Gauge ID`[!(Master_sub$`Gauge ID` %in% all_amax_master$`Gauge ID`)]
-sgfiles <- sgfiles[sg_id %in% M_sub] # only select files relevant to the Master spreadsheet
+sgfiles <- sgfiles[sg_id %in% M_sub] 
+  # only select files relevant to the Master spreadsheet
 sg_id <- sg_id[sg_id %in% M_sub]
 
 sg_list <- list()
@@ -157,6 +172,7 @@ for(i in 1:length(sg_id)){ # for each stage file
   sg_list[[length(sg_list)+1]] <- df_amax
 }
 
+##### SAVE OUTPUTS #####
 
 # Bind files together
 all_amax_sg15 <- do.call(rbind.data.frame,sg_list) %>%
@@ -171,5 +187,5 @@ all_amax_master <- rbind.data.frame(all_amax_master, all_amax_master_sg15)
 
 
 ##### Save to file
-readr::write_csv(all_amax_master, "./Data/all_level_amax.csv")
+readr::write_csv(all_amax_master, Final_AMAX_out)
       

@@ -1,18 +1,21 @@
 #### Griffin, Adam. 2024-01-01
-# 08458: Winter Floods 2019-21
+# EA project 35752: Hydrological analysis of the 2019-2021 flooding
 
 # Main contributor: Adam Griffin
-# Info: Key functions for summarising
+# Info: Key functions for summarising and plotting key events and the antecedent conditions
 
 # Version 0.1: 2024-01-01. Initial development of code
 # Version 0.2: 2023-01-11. Refactoring for wider distribution.
+# Version 1.0: 2024-07-22. Final version for wider distribution.
 
+##### SETUP #####
 library(Kendall)
 library(boot)
 library(lubridate)
 library(dplyr)
 library(ggplot2)
 library(sf)
+
 
 monthquarter <- function(date) {
   # get monthquarter from date

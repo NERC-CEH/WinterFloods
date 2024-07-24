@@ -1,10 +1,12 @@
 #### Griffin, Adam. 2024-01-15
-# 08458: Winter Floods 2019-21
+# EA project 35752: Hydrological analysis of the 2019-2021 flooding
 
 # Main contributor: Adam Griffin
-# Info: Nonstationary flood frequency analysis
+# Info: Nonstationary flood frequency analysis using the nonstat package.
+# This script is heavily based on the nonstat example pipeline script developed as part of the "Development of interim national guidance on non-stationary fluvial flood frequency estimation FRS18087"
 
 # Version 0.1: 2024-01-15. Initial development of code
+# Version 1.0: 2024-07-22. Final version for wider distribution.
 
 #### SETUP ####
 library(lfstat)
@@ -12,20 +14,20 @@ library(ggplot2)
 library(nonstat) # this needs quite a specific folder structure,
 # refer to documentation for where files are saved.
 
-lfwy <- \(x){
+lfwy <- \(x){ # calculates the water year for each date.
   y=lfstat::water_year(x, origin=10, assign="start")
   as.numeric(levels(y)[y])
 }
 
 #### KEY FILEPATHS ####
-folder <- "./Data/Nonstationary/"
+folder <- "./Data/Nonstationary/" #folder containing input and output data
 dist <- "GEV"
 RPs <- c(2, 10, 20, 50, 100)
 CI <- 90
-key_details_filename <- "./Data/Metadata/Master Station Listings.xlsx"
-all_amax_filename <- "./Data/Flow/AMAX_from_Q_15_list.csv"
-GLO_RP_out <- "./Data/Nonstationary/KeyEvents_AEP_GLO.csv"
-GEV_RP_out <- "./Data/Nonstationary/KeyEvents_AEP_GEV.csv"
+key_details_filename <- "./Data/Metadata/Master Station Listings.xlsx" # key metadata, one station per row
+all_amax_filename <- "./Data/Flow/AMAX_from_Q_15_list.csv" # amax derived from 15-minute data
+GLO_RP_out <- "./Data/Nonstationary/KeyEvents_AEP_GLO.csv" # output file for GLO analysis
+GEV_RP_out <- "./Data/Nonstationary/KeyEvents_AEP_GEV.csv" # output file for GEV analysis
 
 # Trend testing ---------------------------------------------
 MK.test(folder, sig.level = 5)

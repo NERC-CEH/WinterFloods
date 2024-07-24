@@ -1,16 +1,17 @@
 #### Griffin, Adam. 2024-01-01
-# 08458: Winter Floods 2019-21
+# EA project 35752: Hydrological analysis of the 2019-2021 flooding
 
 # Main contributor: Adam Griffin
-# Info: Matching Land cover to catchments
+# Info: Matching Land cover to catchments to understand whether changing from or to urban land cover is linked to the extremeness of flooding.
 
 # Version 0.1: 2024-01-01. Initial development of code
+# Version 1.0: 2024-07-22. Final version for wider distribution.
 
-##### SETUP
+##### SETUP #####
 library(dplyr)
 library(lubridate)
 library(readr)
-library(tidyverse)
+library(tidyverse) # contains dplyr, readr, tidyr, magrittr
 library(readxl)
 library(sf)
 library(Kendall)
@@ -23,10 +24,12 @@ key_storms_filename <- "./Data/Context/Key Storms.csv"
 id_column_kd <- "Gauge ID"
 plot_folder <- ""
 
+# shapefiles containing difference in urban land cover for each catchment/location
 to_urban_filename <- "./Data/LandCoverMaps/ChangeToUrban_WF.shp"
 from_urban_filename <- "./Data/LandCoverMaps/ChangeFromUrban_WF.shp"
 lcm_urban_filename <- "./Data/LandCoverMaps/Urban_in_21_WF.shp"
 
+# Underlying land cover data reduced to essential statistics
 counts_filename <- "./Data/LandCoverMaps/Simple_just_use_count.shp"
 to_filename <- "./Data/LandCoverMaps/Simple_TO.shp"
 simple_1990_filename <- "./Data/LandCoverMaps/Simple1990_classes.shp"
@@ -84,7 +87,8 @@ st_crs(uk_outline) <- "EPSG:27700"
 
 #### AMAX DATA ####
 # This assumes access to UKCEH Oracle Tables
-CH <- RODBC::odbcConnect(dsn = "wla", uid = "swa2", pwd = "swa2")
+# This should be replaced by somme form of table which has Station, Year, Date and Flow of amax timeseries. This code was used for non-NRFA stations for which AMAX had to be derived.
+CH <- RODBC::odbcConnect(dsn = "", uid = "", pwd = "")
 WF2P <- RODBC::sqlQuery(CH,
                  "select * from ~~~~~ where BATCH_ID = 'WINTER_FLOODS_2'",
                  believeNRows = FALSE)
@@ -164,7 +168,7 @@ all_catchments_2021 <- all_catchments_2021 %>% arrange(Gauge_ID)
 #get rank for it.
 
 
-# match all LCM classes to Simple Classes
+# match all LCM classes to Simple Classes (c.f documentation for LCM2015)
 simple_2021 <- all_catchments_2021 %>%
   dplyr::mutate(simple1 = HISTO_1 + HISTO_2,
          simple2 = HISTO_3,
@@ -270,7 +274,7 @@ PF_shapes3 <- PF_shapes3 %>% dplyr::mutate(pc_change=to_urb_pc - from_urb_pc)
 
 
 
-
+#### PLOTS OF TREND VS URBANISATION ####
 ggplot() +
   geom_sf(data = uk_outline,
           fill = "white",
@@ -316,6 +320,8 @@ cowplot::plot_grid(
 )
 dev.off()
 
+
+#### TREND IN RANKINGS AND RATE OF RISE #####
 all_vals <- readr::read_csv("./Data/Context/Aligned_events.csv")
 all_vals2 <- all_vals %>% left_join(PF_MK, by=c("Gauge ID"="Gauge_ID")) %>% 
   group_by(`Gauge ID`) %>%
@@ -341,29 +347,3 @@ png("./Images/UrbanVMaxRP_flow.png", width=90, height=90, units="mm", res=240, p
     ) +
     theme_bw(base_size=8)
 dev.off()
-
-hist_storms <- readr::read_csv("./Data/Context/Extent_of_old_storms_regional.csv", show_col_types=F)
-hist_storms <- hist_storms %>%
-  dplyr::filter(Area==params$region) 
-hist_storms1 <- hist_storms %>% 
-  select("Storm"=Storm_name, "Start"=Start_Date, "End"= End_Date, "Flow"=flow, "Level"=level) 
-
-feh_flow <- readr::read_csv(feh_flow_filename)
-
-
-all_vals3 <- all_vals %>% left_join(PF_MK, by=c("Gauge ID"="Gauge_ID")) %>% 
-  group_by(`Gauge ID`) %>%
-  slice_min(order_by=ror_rank, n=1, na_rm=T)
-
-all_vals <- all_vals %>% filter(Volume_2_week > 0 | is.na(Volume_2_week))
-
-ror_trends <- read_csv("./Data/Context/ROR_Trends.csv") %>%
-  mutate(trend = (trend_sig<=0.05)*sign(trend_Z)) %>%
-  filter(period==1)
-ror_trends <- ror_trends[str_detect(ror_trends$file, fixed("/Q 15/035008_ror.csv"), negate=T),]
-
-all_vals4 <- left_join(ror_trends, all_vals, by=c("GaugeID"="Gauge ID"))
-
-
-
-

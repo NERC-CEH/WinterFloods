@@ -1,13 +1,12 @@
 #### Griffin, Adam. 2024-01-01
-# 08458: Winter Floods 2019-21
+# EA project 35752: Hydrological analysis of the 2019-2021 flooding
 
 # Main contributor: Adam Griffin
-# Info: Matching storms with antecedent conditions
+# Info: Matching storms with antecedent conditions, based on station numbers and event dates. Antecedent conditions include COSMOS soil moisure, groundwater, and long-term rainfall accumulations.
 
 # Version 0.1: 2024-01-01. Initial development of code
-# Version 0.2: 2023-01-11. Refactoring for wider distribution.
-
-setwd("P:/08458 CWI-EA 2019-21 Flood Review")
+# Version 0.2: 2024-01-11. Refactoring for wider distribution.
+# Version 1.0: 2024-07-22. Final version for wider distribution.
 
 ##### SETUP #####
 library(dplyr)
@@ -17,12 +16,14 @@ library(tidyverse)
 library(readxl)
 
 ##### Key Arguments #####
-key_details_filename <- "./Data/Context/key_details_with_gw_cosmos.csv"
-key_storms_filename <- "./Data/Context/Key Storms.csv"
-id_column_kd <- "Gauge ID"
-catchments_filename <- "./Data/context/all_locations_rain.shp"
+key_details_filename <- "./Data/Context/key_details_with_gw_cosmos.csv" 
+# groundwater and cosmos values for key events
+key_storms_filename <- "./Data/Context/Key Storms.csv" 
+# storm grouping information
+id_column_kd <- "Gauge ID" # which column has the location ID
+catchments_filename <- "./Data/context/all_locations_rain.shp" # shapefiles of rainfall catchments
 
-
+# outputs from different flood metrics, after post-processing
 feh_flow_filename <- "./Data/Tables_for_Reporting/Table_FEH_stat.csv"
 feh_level_filename <- "./Data/Tables_for_Reporting/Table_Level_ranking2.csv"
 volume_filename <- "./Data/Volumes/event_volumes_with_ranks.csv"
@@ -32,10 +33,6 @@ cosmos_filename <- "./Data/Context/event_cosmos_wvc.csv"
 groundwater_filename <- "./Data/Context/gw_for_closest_station.csv"
 rate_of_rise_filename <- "./Data/Tables_for_Reporting/Table_14_level.csv"
 storm_details_filename <- "./Data/Context/Storm_matching.csv"
-
-
-##### extra functions #####
-source("./Code/Context/rp_plot_group.R")
 
 ##### READ IN DATA #####
 # Match rainfall, flow, level, COSMOS, groundwater, rate of rise
@@ -153,6 +150,9 @@ gw <- gw %>%
 all_vals <- left_join(all_vals, gw, by=c("Gauge ID"="ID", "Date"="Date"))
 
 
+
+
+
 ##### COINCIDENT CONDITIONS #####
 # ancillary functions to work out joint antecedent conditions
 f <- function(flood,flood_min=4, antec,antec_min=6){
@@ -166,7 +166,8 @@ f <- function(flood,flood_min=4, antec,antec_min=6){
   z
 }
 g <-  function(flood,flood_maflood=20,antec,antec_min=6){
-  # use this function if antecedent has min thresholds for rank, but flow(flood) has min rp threshold
+  # use this function if antecedent has min thresholds for rank,
+  # but flow(flood) has min rp threshold
   z <- 1*(flood>flood_maflood) + 10*(antec<antec_min) + 100*(flood<=flood_maflood) + 1000*(antec>=antec_min)
   z[is.na(flood)] <- NA
   z[is.na(antec)] <- NA
@@ -206,13 +207,14 @@ key_storm_groups <- key_storms %>%
 
 ##### STORM AND STORM GROUP MATCHING #####
 for(i in 1:nrow(all_vals)){
+  # which storm is it part of?
   w <- which(key_storms$start_date <= all_vals$Date[i] &
                key_storms$end_date >= all_vals$Date[i])
   if(length(w) > 0){
     all_vals$storm_name[i] <- key_storms$storm_name[w[1]]
     all_vals$storm_start_date[i] <- key_storms$start_date[w[1]]
   }
-  
+  # which storm group is it part of?
   v <- which(key_storm_groups$start_date_gp <= all_vals$Date[i] &
                key_storm_groups$end_date_gp >= all_vals$Date[i])
   if(length(v)>0){

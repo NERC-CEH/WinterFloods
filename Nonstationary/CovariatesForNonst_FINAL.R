@@ -1,22 +1,22 @@
 #### Griffin, Adam. 2024-01-01
-# 08458: Winter Floods 2019-21
+# EA project 35752: Hydrological analysis of the 2019-2021 flooding
 
 # Main contributor: Adam Griffin
-# Info: Getting covariates for nonstationary analysis
+# Info: Getting covariates for nonstationary analysis: specifically annual and
+# seasonal rainfall and flow totals.
 
 # Version 0.1: 2024-01-01. Initial development of code
-
+# Version 1.0: 2024-07-22. Final version for wider distribution.
 
 ##### SETUP #####
 library(tidyverse)
 library(lfstat)
 library(pracma)
 
-rainfall_path <- "./Data/HadUK-Grid_CatAvgDailyRain"
-dates_path <-  "./Data/Nonstationary/dates_of_events.csv"
-events_path <- "./Data/Metadata/KeyDetails_Long.csv"
-NRFA_path <- "./NRFA_PF_V12/suitable-for-pooling" ## Needs NRFA Peak flow dataset
-
+rainfall_path <- "./Data/HadUK-Grid_CatAvgDailyRain" # HADUK catchment average daily rainfall folder
+dates_path <-  "./Data/Nonstationary/dates_of_events.csv" # key dates of events for non-stationary analysis
+events_path <- "./Data/Metadata/KeyDetails_Long.csv" #key metadata of events, one event per row.
+NRFA_path <- "./NRFA_PF_V12/suitable-for-pooling" #NRFA Peak flow dataset of "suitable for pooling" stations. Needed for the nonstat package.
 
 
 #### READ IN DATA ####
@@ -32,6 +32,7 @@ KeyLocs <- KeyEvents %>% select(`NRFA ID`, `Gauge ID`, )
 nonstLocs <- c(25009, 27009, 27029, 27034, 28060, 33034, 39014, 39089, 47004,
                53004, 68001, 69023, 70004, 71009, 72005, 73005, 73009)
 
+# just keep rainfall for the relevant stations
 RF <- RF[stnno %in% nonstLocs]
 stnno <- stnno[stnno %in% nonstLocs]
 
@@ -44,11 +45,12 @@ annual_list <- list()
 
 #### ANALYSIS ####
 
+# detrending data function (using "linear polynomial" and adding back on mean.
 dtrd <- \(x, y){y - pracma::polyval(pracma::polyfit(x, y, 1), x) + mean(y, na.rm=T)}
 
 #Calculate Seasonal and Annual Rainfall Statistics
 
-for(i in seq_along(RF)){
+for(i in seq_along(RF)){ # for each station
   # Get rainfall data
   print(RF[i])
   TS <- readr::read_csv(RF[i], col_names = c("Date","Rainfall"),
@@ -69,10 +71,12 @@ for(i in seq_along(RF)){
   
   seasonal_list[[i]] <- seasonal
   
+  # get totals
   annual <- TS %>%
     group_by(WY) %>%
     summarise(ann=sum(Rainfall))
   
+  # detrend the totals
   annual$detrend <- dtrd(annual$WY, annual$ann)
   
   annual_list[[i]] <- annual
@@ -131,6 +135,7 @@ for(i in seq_along(RF)){
       as.numeric()
   }
   
+  # final metadata
   RA$Station <- stnno[i]
   RA_list[[i]] <- RA
   

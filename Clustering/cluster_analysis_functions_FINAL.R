@@ -1,12 +1,12 @@
 #### Griffin, Adam. 2023-09-01
-# 08458: Winter Floods 2019-21
+# EA project 35752: Hydrological analysis of the 2019-2021 flooding
 
 # Main contributor: Adam Griffin
-# Info: functions to perform cluster analysis of POT series.
+# Info: functions to perform cluster analysis of POT series based on kernel density clustering (Merz et al., 2016, JoH)
 
 # Version 0.1: 2023-06-01. Initial development of code
 # Version 0.2: 2023-11-01. Refactoring for wider distribution.
-
+# Version 1.0: 2024-07-22. Final version for wider distribution.
 
 
 #### FUNCTIONS ####

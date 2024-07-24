@@ -1,19 +1,21 @@
 #### Griffin, Adam. 2024-01-15
-# 08458: Winter Floods 2019-21
+# EA project 35752: Hydrological analysis of the 2019-2021 flooding
 
 # Main contributor: Adam Griffin
-# Info: Matching storms with antecedent conditions
+# Info: Matching storms with COSMOS antecedent conditions, using closest COSMOS station,
+# and extracting VWC rank for the given month quarter.
 
 # Version 0.1: 2024-01-15. Initial development of code
-
-setwd("P:/08458 CWI-EA 2019-21 Flood Review")
+# Version 1.0: 2024-07-22. Final version for wider distribution.
 
 ##### SETUP
 library(dplyr)
 library(lubridate)
 library(readr)
-library(tidyverse)
+library(tidyverse)  # contains dplyr, readr, tidyr, magrittr
 library(readxl)
+
+source("./Code/Context/SummarisingFunctions_FINAL.R")
 
 ##### Key Arguments #####
 key_details_filename <- "./Data/Master Station Listings.xlsx"
@@ -27,23 +29,23 @@ cosmos_monthquarter_folder <- "./Data/COSMOS/Ranked_MonthQuarter"
 cosmos_match_filename <- "./Data/COSMOS-UK_data/Closest_COSMOS_to_each_station.csv"
 cosmos_metadata_filename <- "./Data/COSMOS-UK_data/Max_VWC_per_site.csv"
 
-source("./Code/Context/SummarisingFunctions_FINAL.R")
+output_cosmos_data_filename <- "./Data/Context/event_cosmos_wvc.csv"
 
-# for each station
-# for each event
-# find nearest COSMOS station
-# find VWC rank for preceding month quarter (rank and rank/reclen)
 
-key_details <- readxl::read_xlsx(key_details_filename, sheet=5)[,1:22]
+
+##### READ IN DATA ####
+key_details <- readxl::read_xlsx(key_details_filename, sheet=5)[,1:22] #only keeps necessary metadata
 cosmos_match <- readr::read_csv(cosmos_match_filename) %>% na.omit()
 cosmos_files <- list.files(cosmos_monthquarter_folder, full.names=T)
 
-#setup
+
+##### PREALLOCATION
 cosmos_levels_out <- list()
 
-E1 <- which(colnames(key_details) == "Event 1")
+E1 <- which(colnames(key_details) == "Event 1") # find the key columns to get events from
 E6 <- which(colnames(key_details) == "Event 6")
 
+##### ANALYSIS #####
 for(i in seq_len(nrow(key_details))){ # for each station
   S <- sum(!is.na(key_details[i, E1:E6])) # how many events are there?
   gid <- key_details$`Gauge ID`[i]
@@ -58,9 +60,10 @@ for(i in seq_len(nrow(key_details))){ # for each station
   }
   for(j in seq_len(S)){ # for each event
     L <- list()
+    # get metadata
     L$id <- gid
     L$cosmos <- c_site
-    y <- key_details[[E1 + (j-1)]][i]
+    y <- key_details[[E1 + (j-1)]][i] # key event date
     L$event_date <- y
     L$monthquarter <- monthquarter(y)
     quarterdate <- paste0(
@@ -71,10 +74,13 @@ for(i in seq_len(nrow(key_details))){ # for each station
     L$rank <- COSMOS_in$Rank[w]
     L$reclen <- COSMOS_in$Of[w]
     L$monthquarter <- COSMOS_in$Month_quarter[w]
+    # save to output dataframe
     cosmos_levels_out[[length(cosmos_levels_out)+1]] <- data.frame(L)
     }
 }
 
+
+##### SAVE OUTPUTS #####
 # convert to data_frame and save to file
 cosmos_levels_data_frame <- do.call(rbind.data.frame, cosmos_levels_out)
-readr::write_csv(cosmos_levels_data_frame, "./Data/Context/event_cosmos_wvc.csv")
+readr::write_csv(cosmos_levels_data_frame, output_cosmos_data_filename)

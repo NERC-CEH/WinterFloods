@@ -1,25 +1,27 @@
 ### giaves 2023-11-09
-# 08458: Winter Floods 2019-21
+# EA project 35752: Hydrological analysis of the 2019-2021 flooding
 
-# Main contributor: GV
-# Info: Plot highest COSMOS volumetric water content for each site
+# Main contributor: Gianni Vesuviano
+# Info: Plot highest COSMOS volumetric water content for each site, 
+# based on month-quarter collation.
 
 # Version 0.1: 2023-11-09. Initial development of code
 # Version 0.2: 2023-11-30. Refactoring for wider distribution.
+# Version 1.0: 2024-07-22. Final version for wider distribution.
 
 #### SETUP ####
 library(viridis)
 
 #### KEY FILEPATHS ####
-monthquarter_folder <- "Data/COSMOS-UK_data/Ranked_Monthquarter"
-plot_outfolder <- "Images/COSMOS 7-day plots/"
+monthquarter_folder <- "Data/COSMOS-UK_data/Ranked_Monthquarter" # folder for COSMOS ranked input data
+plot_outfolder <- "" # folder for plots to go into
 
 
 CF <- list.files(monthquarter_folder, full = TRUE)
 CFname <- list.files(monthquarter_folder, full = FALSE)
 N <- length(CF)
 
-for (i in 1:N) {
+for (i in 1:N) {  # for each cosmos-uk station
   
   ### Read in data
   SiteName <- unlist(strsplit(CFname[i], "_monthquarter.csv"))
@@ -45,7 +47,7 @@ for (i in 1:N) {
     MN <- as.numeric(substr(Day, 1, 2))
     MQ <- substr(Day, 5, 5)
     
-	# month quarters
+	# month quarters manual calculation
     MonthDays <- if (MQ == 1) "01-08" else if (MQ == 2) "09-15" else if (MQ == 3) "16-23"
     if (MQ == 4) {
       if (MN %in% c(1, 3, 5, 7, 8, 10, 12)) MonthDays <- "24-31" else MonthDays <- "24-30"
@@ -61,6 +63,7 @@ for (i in 1:N) {
   #### PLOTTING ####
   
   if(dim(PlotDates)[1] == 0){
+    
   # No data plot
     png(sprintf(paste0(plot_outfolder,"/%s-7-day-VWC.png"), SiteName),
         units = "mm", width = 80, height = 80, res = 600, family = "FreeSans")
@@ -68,12 +71,15 @@ for (i in 1:N) {
     plot(NA, xlim = c(0, 1), ylim = c(0, 1))
     text(0.5, 0.5, sprintf("No data at %s\nfor June 2019 - June 2021", gsub("_", " ", SiteName)))
     dev.off()
+    
+    
   }else{
 	# colour palette
     vir <- if (max(na.omit(PlotDates$Based_on_days)) == 8) rev(viridis(8)) else rev(viridis(7))
     Y20 <- which(PlotDates$Year == 2020)
     Y21 <- if(as.numeric(substr(Day, 1, 2)) <= 6) which(PlotDates$Year == 2021) else which(PlotDates$Year == 2019)
     
+    ## Plotting
     png(sprintf(paste0(plot_outfolder,"/%s-7-day-VWC.png"), SiteName),
         units = "mm", width = 80, height = 80, res = 600, family = "FreeSans")
     par(mar = c(3, 3, 1, 1), mgp = c(2, 0.75, 0), cex = 2/3)

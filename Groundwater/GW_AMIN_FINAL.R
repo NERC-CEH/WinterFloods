@@ -1,11 +1,12 @@
 #### giaves. 2023-09-13
-# 08458: Winter Floods 2019-21
+# EA project 35752: Hydrological analysis of the 2019-2021 flooding
 
-# Main contributor: GV
+# Main contributor: Gianni Vesuviano
 # Info: Load each groundwater record, extract WY AMIN
 
 # Version 0.1: 2023-09-13. Initial development of code
 # Version 0.2: 2023-11-01. Refactoring for wider distribution.
+# Version 1.0: 2024-07-22. Final version for wider distribution.
 
 ### NOTE: source groundwater data not given as data product in this project.
 
@@ -19,8 +20,8 @@ Mode <- function(x) {
 }
 
 #### KEY FILEPATHS ####
-gw_data_folder <- "Data/Groundwater/"
-gw_amin_outfile <- "Data/Groundwater/GW_CL_AMIN.csv"
+gw_data_folder <- "Data/Groundwater/" # raw groundwater data folder
+gw_amin_outfile <- "Data/Groundwater/GW_CL_AMIN.csv" # output file for depth AMIN data
 
 #### READ IN DATA ####
 GWlist <- list.files(path = gw_data_folder, full = TRUE)
@@ -36,24 +37,29 @@ AMINS <- data.frame(Station = NA,
                     Wint = NA,
                     WCompl = NA)
 
-for (i in 1:length(GWlist)) {
+for (i in 1:length(GWlist)) { # for each file
   
+  # get list of files
   GWnames <- strsplit(GWlist[i], "/")[[1]][5]
   
   GW <- read.csv(GWlist[i], fill = TRUE, skip = 15)
+  #get name of station
   GWname <- strsplit(GWnames, "\\.")[[1]][1]
   
+  #check date formatting
   GW$Time.stamp <- lubridate::ymd_hms(GW$Time.stamp, tz="UTC")
   GW$Absolute..mAOD. <- as.numeric(GW$Absolute..mAOD.)
   NAval <- which(is.na(GW$Absolute..mAOD.))
   if (length(NAval) > 0) GW <- GW[-NAval, ]
 
+  # switch to hydrological day
   GW$Time.stamp <- GW$Time.stamp - hours(9)
   GW$Day <- date(GW$Time.stamp)
   
   GW2 <- aggregate(GW$Absolute..mAOD., by=list(GW$Day), min)
   colnames(GW2) <- c("Day", "Absolute..mAOD.")
   
+  # find AMIN based on hydrological year (starts in October)
   GW$WY <- year(GW$Time.stamp)
   GW$WY[which(month(GW$Time.stamp) < 10)] <- GW$WY[which(month(GW$Time.stamp) < 10)] - 1
   GW$Wint <- as.numeric(month(GW$Time.stamp))
@@ -70,12 +76,14 @@ for (i in 1:length(GWlist)) {
   WintCompl <- aggregate(GW$Wint, by=list(GW$WY), sum)
   colnames(WintCompl) <- c("WY", "WCompl")
   
+  # merge daily and subdaily data
   if (length(strsplit(GWnames, "\\-level")[[1]]) > 1){
     if (strsplit(GWnames, "\\-level")[[1]][2] == "-15min-Qualified.csv"){
       GW <- merge(GW, WintCompl)
     }
   }
   
+  # cap values at zero
   GW$Absolute..mAOD.[GW$Absolute..mAOD. < 0] <- 0
   GW$Absolute..mAOD.[is.na(GW$Absolute..mAOD.)] <- 0
   
@@ -89,9 +97,11 @@ for (i in 1:length(GWlist)) {
   AMIN <- merge(AMIN, GW)
   AMIN <- merge(AMIN, WintCompl)
   
+  # account for leap years
   LeapYear <- AMIN$WY %% 4
   LeapYear[LeapYear < 3] <- 0
   
+  # completeness of data calculated as fraction of year
   AMIN$WCompl <- AMIN$WCompl / (182 + LeapYear/3)
   
   AMIN <- AMIN[order(AMIN$Day), ]

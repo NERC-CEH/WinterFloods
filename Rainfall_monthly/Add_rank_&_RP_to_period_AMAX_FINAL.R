@@ -1,11 +1,12 @@
 ### giaves 2023-10-09
-# 08458: Winter Floods 2019-21
+# EA project 35752: Hydrological analysis of the 2019-2021 flooding
 
 # Main contributor: Gianni Vesuviano
 # Read 30-, 60-, 90- and 180-day rainfall maxima, and add ranks and return periods
 
 # Version 0.1: 2023-10-09. Initial development of code
 # Version 0.2: 2023-11-01. Refactoring for wider distribution.
+# Version 1.0: 2024-07-22. Final version for wider distribution.
 
 
 ##### SETUP #####
@@ -24,10 +25,10 @@ CSVL <- list.files(path = long_rain_folder,
 ID <- unique(read.csv(CSVL[1])$ID)
 
 #### for each table of M-day annual maxima
-for (C in 1:length(CSVL)) {
+for (C in 1:length(CSVL)) { # for each rainfall file
   
   Rain <- read.csv(CSVL[C])
-  Dur <- gsub("[^0-9]", "", CSVL[C])
+  Dur <- gsub("[^0-9]", "", CSVL[C]) # calculate duration
   
   RainWF <- RainPlus <- data.frame(NRFA_ID = integer(0), Gauge = character(0),
                          River = character(0), ID = character(0),
@@ -41,7 +42,9 @@ for (C in 1:length(CSVL)) {
     RainTemp <- RainTemp[rev(order(RainTemp$Total)), ]
     RainTemp$Rank <- 1:nrow(RainTemp)
     # fit GEV distribution using L-moments
-    CDF <- lmom::cdfgev(RainTemp$Total, lmom::pelgev(lmom::samlmu(RainTemp$Total)))
+    CDF <- lmom::cdfgev(
+      RainTemp$Total, lmom::pelgev(lmom::samlmu(RainTemp$Total)))
+    # convert to 1 in x AEP
     RainTemp$RP <- 1 / (1 - CDF)
     RainTemp <- RainTemp[order(RainTemp$WaterYear), ]
     RainTemp$WaterYear <- 1891:2020
