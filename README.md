@@ -1,5 +1,5 @@
 # WinterFloods
-Code for rainfall and peak flow analysis (EA project)
+This code includes the data processing and analysis pipelines and functions to undertake a wide range of fluvial and pluvial flood frequency analysis, putting the key events of 2019-2021 into context, and compares the antecedent conditions to previous extreme flooding events. The data required to undertake the analysis is not included, but is available from the NRFA website, the EA Hydrology Data Explorer, The Met Office (for Had-UK), or by request from the Environment Agency.
 
 ## Project: Winter Floods 2019-2021
 Author: UKCEH
